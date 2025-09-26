@@ -48,7 +48,7 @@ const Banner = () => {
     });
 
     return (
-        <div className={`h-screen relative  bg-[#100a08] overflow-hidden`}>
+        <div className={`h-screen  relative  bg-[#100a08] overflow-hidden`}>
             <div className="absolute inset-0 bg-[url('/beans-bg.png')] bg-bottom bg-no-repeat bg-cover opacity-20"></div>
             <div className="relative  flex flex-col md:flex-row justify-center px-[9vw] items-center h-full  text-white">
                 <div className='md:w-1/2 '>
