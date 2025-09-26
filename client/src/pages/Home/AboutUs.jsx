@@ -1,0 +1,67 @@
+import img from '/pexels-pavel-danilyuk-6612648.jpg'
+import { FiCoffee } from "react-icons/fi";
+import { CiCoffeeCup } from "react-icons/ci";
+import { GoClock } from "react-icons/go";
+
+const AboutUs = () => {
+    return (
+        <div className={`h-screen bg-[url('/bg-2.jpg')] w-full  bg-center`}>
+            <div className="flex justify-between  items-center h-full px-[12vw]">
+                
+                <div className="   w-1/2">
+                    <div className='flex items-center gap-2 text-2xl font-urbanist'>
+                        <FiCoffee className='mb-1' />
+                        <h1 >About Us</h1>
+                    </div>
+                    <h1 className='text-6xl font-moglan mt-5 text-white'>Bringing People Together One Cup At A Time</h1>
+                    <div className='flex gap-3 mt-5'>
+                        <div className='  bg-backgrondLight w-25 h-20 flex justify-center items-center text-4xl rounded-full'>
+                            <CiCoffeeCup className='' />
+                        </div>
+                        <div className='text-white'>
+                            <h1 className='text-2xl'>Food Delivery</h1>
+                            <h1>With our fast and reliable food delivery service, your favorite coffee, snacks, and treats are just a click away.</h1>
+                        </div>
+                    </div>
+                    <div className='flex gap-3 mt-5'>
+                        <div className='  bg-backgrondLight w-25 h-20 flex justify-center items-center text-4xl rounded-full'>
+                            <CiCoffeeCup className='' />
+                        </div>
+                        <div className='text-white'>
+                            <h1 className='text-2xl'>Food Delivery</h1>
+                            <h1>With our fast and reliable food delivery service, your favorite coffee, snacks, and treats are just a click away.</h1>
+                        </div>
+                    </div>
+                    <div className='mt-12'>
+                        <button className='bg-lightCoffee text-backgrondDark px-5 py-2 rounded-full'>More About Us</button>
+                    </div>
+                </div>
+                <div className='w-1/2 h relative flex justify-center items-center'>
+                    <div className=" w-96 rounded-t-full border-2">
+                        <img src={img} alt="" className=' object-center rounded-t-full object-cover' />
+                    </div>
+                    <div className='bg-white rounded-2xl -bottom-20 right-20 w-72 p-5 absolute font-urbanist text-gray-700'>
+                        <div className='w-fit rounded-full text-white p-2 bg-gray-700 '>
+                            <GoClock className='text-2xl'></GoClock>
+                        </div>
+                        <h1 className='font-bold text-xl mt-3'>Open Hours</h1>
+                        <div className='flex justify-between mt-2'>
+                            <h1>Monday - Friday</h1>
+                            <h1>09.30 - 7.30</h1>
+                        </div>
+                        <div className='flex justify-between '>
+                            <h1>Saturday</h1>
+                            <h1>10.30 - 9.30</h1>
+                        </div>
+                        <div className='flex justify-between '>
+                            <h1>Sunday</h1>
+                            <h1>24 Hours open</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default AboutUs;
