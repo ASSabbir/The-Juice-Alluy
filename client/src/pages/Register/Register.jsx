@@ -1,15 +1,143 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./../../providers/AuthContext";
+import { useState } from "react";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { updateProfile } from "firebase/auth";
+import { auth } from "./../../components/firebase/firebase.config";
 import { Typewriter } from "react-simple-typewriter";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Register = () => {
+  const { handelSignup, googleSign } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [flag, setFlag] = useState(false);
+
+  const navg = useNavigate();
+
+  // Toast setup
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
+  // Form submit
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setFlag(true);
+
+    const formData = new FormData();
+    const username = e.target.username.value;
+    const email = e.target.email.value;
+    const role = e.target.role.value;
+    const password = e.target.password.value;
+    const confirm = e.target.confirm.value;
+    const photoFile = e.target.photo.files[0];
+
+    if (
+      username === "" ||
+      email === "" ||
+      password === "" ||
+      confirm === "" ||
+      !photoFile
+    ) {
+      Toast.fire({ icon: "error", title: "All fields must be filled out." });
+      setFlag(false);
+      return;
+    }
+
+    if (password !== confirm) {
+      Toast.fire({ icon: "error", title: "Passwords do not match!" });
+      setFlag(false);
+      return;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+    if (!passwordRegex.test(password)) {
+      Toast.fire({
+        icon: "error",
+        title: "Password must have 1 uppercase, 1 lowercase & 6+ chars",
+      });
+      setFlag(false);
+      return;
+    }
+
+    // Upload to imgbb
+    formData.append("image", photoFile);
+    const response = await axios.post(
+      "https://api.imgbb.com/1/upload?key=32d886aa9e324d1a97049283e3514259",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+
+    const url = response.data.data.display_url;
+
+    // Firebase signup
+    if (response.data.success) {
+      handelSignup(email, password)
+        .then(() => {
+          updateProfile(auth.currentUser, {
+            displayName: username,
+            photoURL: url,
+          })
+            .then(() => {
+              Toast.fire({
+                icon: "success",
+                title: `Welcome ${auth.currentUser.displayName}`,
+              });
+
+              // Save user to DB
+              const user = { email, role };
+              axios
+                .post("https://skillpath-bay.vercel.app/users", user)
+                .then((res) => console.log(res.data))
+                .catch((error) => console.log(error));
+
+              setFlag(false);
+              navg(location.state ? location.state : "/");
+            })
+            .catch((err) => console.log(err));
+        })
+        .catch((error) => {
+          Toast.fire({ icon: "error", title: error.code });
+          setFlag(false);
+        });
+    }
+  };
+
+  // Google register
+  const handelgoogle = () => {
+    googleSign()
+      .then((user2) => {
+        Toast.fire({
+          icon: "success",
+          title: `Welcome ${user2.user.displayName}`,
+        });
+        const user = { email: user2.user.email, role: "User" };
+        axios
+          .post("https://skillpath-bay.vercel.app/users", user)
+          .then((res) => console.log(res.data))
+          .catch((error) => console.log(error));
+
+        navg(location.state ? location.state : "/");
+      })
+      .catch((error) => {
+        Toast.fire({ icon: "error", title: error.code });
+      });
+  };
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] flex flex-col lg:flex-row items-center justify-center px-6 py-16">
-      {/* Left Side Image */}
+      {/* Left Image */}
       <div className="hidden lg:flex lg:w-1/2 justify-center items-center">
         <img
           src="https://images.unsplash.com/photo-1511920170033-f8396924c348"
@@ -18,12 +146,14 @@ const Register = () => {
         />
       </div>
 
-      {/* Right Side Form */}
+      {/* Right Form */}
       <div className="w-full max-w-md bg-[#1a1a1a] rounded-2xl shadow-2xl p-8 relative z-10">
-        {/* Typewriter Heading */}
         <h2 className="text-3xl font-extrabold text-center mb-6 text-[#d2a679] drop-shadow-lg">
           <Typewriter
-            words={["Create Your Coffee Account ☕", "Join the Coffee Lovers Family ❤️"]}
+            words={[
+              "Create Your Coffee Account ☕",
+              "Join the Coffee Lovers Family ❤️",
+            ]}
             loop={true}
             cursor
             cursorStyle="|"
@@ -32,14 +162,11 @@ const Register = () => {
             delaySpeed={2000}
           />
         </h2>
-
-        {/* Motivation Text */}
         <p className="text-gray-400 text-center mb-8 italic">
           "Every sip begins with a story — let’s start yours today."
         </p>
 
-        {/* Form */}
-        <form className="space-y-6">
+        <form onSubmit={handleFormSubmit} className="space-y-6">
           {/* Name */}
           <div>
             <label className="block text-gray-300 mb-2">Full Name</label>
@@ -47,6 +174,7 @@ const Register = () => {
               <FaUser className="text-[#d2a679] mr-3" />
               <input
                 type="text"
+                name="username"
                 placeholder="Enter your name"
                 className="w-full py-3 bg-transparent text-white focus:outline-none"
               />
@@ -60,10 +188,25 @@ const Register = () => {
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
                 type="email"
+                name="email"
                 placeholder="Enter your email"
                 className="w-full py-3 bg-transparent text-white focus:outline-none"
               />
             </div>
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block text-gray-300 mb-2">Role</label>
+            <select
+              name="role"
+              defaultValue="User"
+              className="w-full py-3 px-3 rounded-xl bg-[#0f0f0f] text-gray-300 border border-[#333] focus:outline-none"
+            >
+              <option>User</option>
+
+              <option>Admin</option>
+            </select>
           </div>
 
           {/* Password */}
@@ -73,6 +216,7 @@ const Register = () => {
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 placeholder="Enter your password"
                 className="w-full py-3 bg-transparent text-white focus:outline-none"
               />
@@ -93,6 +237,7 @@ const Register = () => {
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showConfirm ? "text" : "password"}
+                name="confirm"
                 placeholder="Confirm your password"
                 className="w-full py-3 bg-transparent text-white focus:outline-none"
               />
@@ -106,17 +251,61 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg
-                       bg-gradient-to-r from-[#d2a679] to-[#b58855] 
-                       shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50 
+          {/* Photo */}
+          <div>
+            <label className="block text-gray-300 mb-2">Upload Photo</label>
+            <input
+              type="file"
+              name="photo"
+              className="file-input file-input-bordered w-full text-white bg-[#0f0f0f] border border-[#333]"
+            />
+          </div>
+
+          {/* Submit */}
+          {flag ? (
+            <button
+              disabled
+              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg bg-gray-600"
+            >
+              <span className="loading loading-bars loading-sm"></span>
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg
+                       bg-gradient-to-r from-[#d2a679] to-[#b58855]
+                       shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50
                        transition duration-300"
-          >
-            Register
-          </button>
+            >
+              Register
+            </button>
+          )}
         </form>
+
+        {/* Google */}
+        <div className="flex items-center pt-4 space-x-1">
+          <div className="flex-1 h-px bg-gray-500"></div>
+          <p className="px-3 text-sm text-gray-400">Or sign up with</p>
+          <div className="flex-1 h-px bg-gray-500"></div>
+        </div>
+        <div className="flex justify-center mt-3">
+          <button
+            onClick={handelgoogle}
+            aria-label="Register with Google"
+            className="p-3 rounded-full bg-white hover:bg-gray-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              className="w-6 h-6"
+            >
+              <path
+                fill="#4285F4"
+                d="M16.318 13.714v5.484h9.078c-.37 2.354-2.745 6.901-9.078 6.901-5.458 0-9.917-4.521-9.917-10.099s4.458-10.099 9.917-10.099c3.109 0 5.193 1.318 6.38 2.464l4.339-4.182c-2.786-2.599-6.396-4.182-10.719-4.182-8.844 0-16 7.151-16 16s7.156 16 16 16c9.234 0 15.365-6.49 15.365-15.635 0-1.052-.115-1.854-.255-2.651z"
+              ></path>
+            </svg>
+          </button>
+        </div>
 
         {/* Footer */}
         <p className="text-center text-gray-400 mt-6">
