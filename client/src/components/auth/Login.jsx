@@ -76,7 +76,7 @@ const Login = () => {
                     icon: "success",
                     title: `WelCome ${user2.user.displayName} `
                 });
-                const user={email:user2.user.email,role:'Student'}
+                const user={email:user2.user.email,role:'User'}
                 axios.post('https://skillpath-bay.vercel.app/users', user)
                     .then(res => console.log(res.data))
                     .catch(error => { console.log(error) })
@@ -119,8 +119,8 @@ const Login = () => {
                             {showDummy && (
                                 <div className="space-y-2">
                                     <button type="button" onClick={() => fillCredentials('foradmin@gmail.com', '123456789@Aa')} className="block w-full p-2 bg-blue-500 text-white rounded-md">Dummy Admin</button>
-                                    <button type="button" onClick={() => fillCredentials('forstudent@gmail.com', '123456789@Aa')} className="block w-full p-2 bg-green-500 text-white rounded-md">Dummy Student</button>
-                                    <button type="button" onClick={() => fillCredentials('fortutor1@gmail.com', '123456789@Aa')} className="block w-full p-2 bg-purple-500 text-white rounded-md">Dummy Tutor</button>
+                                    <button type="button" onClick={() => fillCredentials('forUser@gmail.com', '123456789@Aa')} className="block w-full p-2 bg-green-500 text-white rounded-md">Dummy User</button>
+                                    
                                 </div>
                             )}
 

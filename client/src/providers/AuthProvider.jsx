@@ -24,19 +24,22 @@ const AuthProvider = ({children}) => {
     const handelSignin=(email,pass)=>{
         return signInWithEmailAndPassword(auth, email, pass)
     }
-    useEffect(()=>{
-        const unsub=onAuthStateChanged(auth,currentUser=>{
+    useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+        setLoading(false);
 
-            setUser(currentUser)
-            setLoading(false)
-            // console.log(currentUser.email)
-            localStorage.setItem('user',JSON.stringify(currentUser.email))
-
-        })
-        return()=>{
-            unsub();
+        if (currentUser) {
+            // user লগইন করা আছে
+            localStorage.setItem("user", JSON.stringify(currentUser.email));
+        } else {
+            // user লগআউট করা বা null
+            localStorage.removeItem("user");
         }
-    },[])
+    });
+    return () => unsub();
+}, []);
+
     const logout=()=>{
         return signOut(auth)
     }

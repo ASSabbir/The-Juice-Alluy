@@ -1,2 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
+@font-face {
+  font-family: moglan;
+  src: url(/Moglan_DEMO.ttf);
+}
+
 @plugin "daisyui";
+
+@theme {
+    
+  --font-urbanist: "Urbanist", sans-serif;
+  --font-dmSans: "DM Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-moglan: moglan, sans-serif;
+
+  --color-backgrondLight: #1b1a1a;
+  --color-backgrondDark: #151514;
+  --color-lightCoffee: #dbad6a;
+  --color-darkCoffee: #3d201b;
+  --color-mediumCoffee: #321808;
+}
