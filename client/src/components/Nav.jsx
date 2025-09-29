@@ -29,7 +29,7 @@ const Nav = () => {
         </ul>
       </div>
       <div className="navbar-end">
-        <a className="">Login</a>
+        {/* <a className="">Login</a> */}
       </div>
     </div>
   );
