@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../../providers/AuthContext";
@@ -8,10 +8,17 @@ import axios from "axios";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { handelSignin, googleSign } = useContext(AuthContext);
   const [flag, setFlag] = useState(false);
+  const { handelSignin, googleSign, user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const navg = useNavigate();
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   // Toast config
   const Toast = Swal.mixin({
@@ -26,14 +33,13 @@ const Login = () => {
     },
   });
 
-  // Dummy credential fill
-
   // Submit login
   const handelSubmit = (e) => {
     e.preventDefault();
     setFlag(true);
     const email = e.target.email.value;
     const password = e.target.password.value;
+
     if (email === "" || password === "") {
       Toast.fire({
         icon: "error",
@@ -47,10 +53,10 @@ const Login = () => {
       .then((user2) => {
         Toast.fire({
           icon: "success",
-          title: `WelCome ${user2.user.displayName}`,
+          title: `Welcome ${user2.user.displayName}`,
         });
         setFlag(false);
-        navg(location.state ? location.state : "/");
+        navigate(location.state?.from || "/");
       })
       .catch((error) => {
         console.log(error);
@@ -68,15 +74,15 @@ const Login = () => {
       .then((user2) => {
         Toast.fire({
           icon: "success",
-          title: `WelCome ${user2.user.displayName}`,
+          title: `Welcome ${user2.user.displayName}`,
         });
-        const user = { email: user2.user.email, role: "User" };
+        const userDoc = { email: user2.user.email, role: "User" };
         axios
-          .post("https://skillpath-bay.vercel.app/users", user)
+          .post("http://localhost:5000/users", userDoc)
           .then((res) => console.log(res.data))
           .catch((error) => console.log(error));
 
-        navg(location.state ? location.state : "/");
+        navigate(location.state?.from || "/");
       })
       .catch((error) => {
         Toast.fire({
@@ -155,8 +161,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Dummy credentials button */}
-
           {/* Submit Button */}
           {flag ? (
             <button
@@ -205,7 +209,7 @@ const Login = () => {
 
         {/* Footer */}
         <p className="text-center text-gray-400 mt-6">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <NavLink
             to="/register"
             className="text-[#d2a679] hover:underline cursor-pointer"
