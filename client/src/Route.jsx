@@ -1,7 +1,7 @@
 
 import {
   createBrowserRouter,
-  
+
 } from "react-router-dom";
 import Root from "./Root";
 import Home from "./pages/Home/Home";
@@ -9,6 +9,7 @@ import Shop from "./pages/Shop/Shop";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import CoffeeDetails from "./pages/Shop/CoffeeDetails";
+import AddToCart from "./pages/Shop/AddToCart";
 
 
 export const Route = createBrowserRouter([
@@ -17,7 +18,7 @@ export const Route = createBrowserRouter([
     element: <Root></Root>,
     children:[
         {
-            path:'/',
+            path:'/a',
             element:<Home></Home>,
         },{
             path:'/shop',
@@ -33,6 +34,10 @@ export const Route = createBrowserRouter([
         {
             path:"/coffee/:id",
             element:<CoffeeDetails/>
+        },
+        {
+            path:"/cart",
+            element:<AddToCart/>
         },
 
 

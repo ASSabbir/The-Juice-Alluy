@@ -8,7 +8,7 @@ const Shop = () => {
   useEffect(() => {
     const getCoffees = async () => {
       try {
-        const res = await axios.get("/coffee.json"); // fetching JSON
+        const res = await axios.get("http://localhost:5000/coffee");
         setCoffees(res.data);
       } catch (error) {
         console.error("Error fetching coffee data:", error);
@@ -49,7 +49,7 @@ const Shop = () => {
               </p>
 
               <div className="card-actions justify-end mt-4">
-                <NavLink to={`/coffee/${coffee.id}`}>
+                <NavLink to={`/coffee/${coffee._id}`}>
                   <button className="relative px-5 py-2.5 font-semibold rounded-xl 
                                      bg-gradient-to-r from-[#d2a679] to-[#b58855] text-black 
                                      shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50

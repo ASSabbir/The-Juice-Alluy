@@ -1,10 +1,91 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { AuthContext } from "../../providers/AuthContext";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { handelSignin, googleSign } = useContext(AuthContext);
+  const [flag, setFlag] = useState(false);
+
+  const navg = useNavigate();
+
+  // Toast config
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1500,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
+  // Dummy credential fill
+
+  // Submit login
+  const handelSubmit = (e) => {
+    e.preventDefault();
+    setFlag(true);
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    if (email === "" || password === "") {
+      Toast.fire({
+        icon: "error",
+        title: "All fields must be filled out.",
+      });
+      setFlag(false);
+      return;
+    }
+
+    handelSignin(email, password)
+      .then((user2) => {
+        Toast.fire({
+          icon: "success",
+          title: `WelCome ${user2.user.displayName}`,
+        });
+        setFlag(false);
+        navg(location.state ? location.state : "/");
+      })
+      .catch((error) => {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: error.code,
+        });
+        setFlag(false);
+      });
+  };
+
+  // Google login
+  const handelgoogle = () => {
+    googleSign()
+      .then((user2) => {
+        Toast.fire({
+          icon: "success",
+          title: `WelCome ${user2.user.displayName}`,
+        });
+        const user = { email: user2.user.email, role: "User" };
+        axios
+          .post("https://skillpath-bay.vercel.app/users", user)
+          .then((res) => console.log(res.data))
+          .catch((error) => console.log(error));
+
+        navg(location.state ? location.state : "/");
+      })
+      .catch((error) => {
+        Toast.fire({
+          icon: "error",
+          title: error.code,
+        });
+        console.log(error);
+      });
+  };
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] flex flex-col lg:flex-row items-center justify-center px-6 py-16">
@@ -38,7 +119,7 @@ const Login = () => {
         </p>
 
         {/* Form */}
-        <form className="space-y-6">
+        <form onSubmit={handelSubmit} className="space-y-6">
           {/* Email */}
           <div>
             <label className="block text-gray-300 mb-2">Email Address</label>
@@ -47,6 +128,7 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
+                name="email"
                 className="w-full py-3 bg-transparent text-white focus:outline-none"
               />
             </div>
@@ -59,6 +141,7 @@ const Login = () => {
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 placeholder="Enter your password"
                 className="w-full py-3 bg-transparent text-white focus:outline-none"
               />
@@ -72,17 +155,53 @@ const Login = () => {
             </div>
           </div>
 
+          {/* Dummy credentials button */}
+
           {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg
-                       bg-gradient-to-r from-[#d2a679] to-[#b58855] 
-                       shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50 
+          {flag ? (
+            <button
+              disabled
+              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg bg-gray-600"
+            >
+              <span className="loading loading-bars loading-sm"></span>
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg
+                       bg-gradient-to-r from-[#d2a679] to-[#b58855]
+                       shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50
                        transition duration-300"
-          >
-            Login
-          </button>
+            >
+              Login
+            </button>
+          )}
         </form>
+
+        {/* Google login */}
+        <div className="flex items-center pt-4 space-x-1">
+          <div className="flex-1 h-px bg-gray-500"></div>
+          <p className="px-3 text-sm text-gray-400">Or login with</p>
+          <div className="flex-1 h-px bg-gray-500"></div>
+        </div>
+        <div className="flex justify-center mt-3">
+          <button
+            onClick={handelgoogle}
+            aria-label="Log in with Google"
+            className="p-3 rounded-full bg-white hover:bg-gray-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              className="w-6 h-6"
+            >
+              <path
+                fill="#4285F4"
+                d="M16.318 13.714v5.484h9.078c-.37 2.354-2.745 6.901-9.078 6.901-5.458 0-9.917-4.521-9.917-10.099s4.458-10.099 9.917-10.099c3.109 0 5.193 1.318 6.38 2.464l4.339-4.182c-2.786-2.599-6.396-4.182-10.719-4.182-8.844 0-16 7.151-16 16s7.156 16 16 16c9.234 0 15.365-6.49 15.365-15.635 0-1.052-.115-1.854-.255-2.651z"
+              ></path>
+            </svg>
+          </button>
+        </div>
 
         {/* Footer */}
         <p className="text-center text-gray-400 mt-6">
