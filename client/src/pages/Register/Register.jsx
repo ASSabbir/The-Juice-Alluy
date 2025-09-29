@@ -96,9 +96,9 @@ const Register = () => {
               });
 
               // Save user to DB
-              const user = { email, role };
+              const user = {username, email, role, photoURL: url };
               axios
-                .post("https://skillpath-bay.vercel.app/users", user)
+                .post("http://localhost:5000/users", user)
                 .then((res) => console.log(res.data))
                 .catch((error) => console.log(error));
 
@@ -124,7 +124,7 @@ const Register = () => {
         });
         const user = { email: user2.user.email, role: "User" };
         axios
-          .post("https://skillpath-bay.vercel.app/users", user)
+          .post("http://localhost:5000/users", user)
           .then((res) => console.log(res.data))
           .catch((error) => console.log(error));
 
