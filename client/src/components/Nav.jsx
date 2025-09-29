@@ -8,7 +8,8 @@ const isLoggedIn = false;
 
 const Nav = () => {
   const [cartCount, setCartCount] = useState(0);
-
+  const [scrollPosition, setScrollPosition] = useState(0)
+  const [isVisible, setIsVisible] = useState(true)
   // Fetch cart count from MongoDB
   const fetchCart = async () => {
     try {
@@ -22,6 +23,24 @@ const Nav = () => {
   useEffect(() => {
     fetchCart();
   }, []);
+
+  // handeling the sticky navber animation 
+  useEffect(() => {
+    const handelScrolling = () => {
+      const currentScrollState = window.scrollY;
+      if (currentScrollState > scrollPosition && currentScrollState > 50) {
+        setIsVisible(false)
+      } else {
+        setIsVisible(true)
+      }
+      setScrollPosition(currentScrollState)
+
+    }
+    window.addEventListener('scroll',handelScrolling);
+    return ()=>{
+      window.removeEventListener('scroll',handelScrolling)
+    }
+  })
 
   const navlinks = (
     <>
@@ -75,7 +94,7 @@ const Nav = () => {
   );
 
   return (
-    <div className="navbar fixed z-50 top-0 px-[8vw] py-3 border-b border-[#d2a679]/40 bg-[#0f0f0f]/90 backdrop-blur">
+    <div className={`navbar fixed z-50 duration-500 top-0 px-[8vw] py-3  ${isVisible ? "translate-y-0" : "-translate-y-full"} ${scrollPosition>50? "bg-backgrondDark/70 backdrop-blur-xl": ""}`}>
       {/* Left: Title */}
       <div className="navbar-start">
         <div className="dropdown">
