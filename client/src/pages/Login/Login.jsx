@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../../providers/AuthContext";
@@ -8,8 +8,17 @@ import axios from "axios";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { handelSignin, googleSign } = useContext(AuthContext);
   const [flag, setFlag] = useState(false);
+  const { handelSignin, googleSign, user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
   const navg = useNavigate();
 
   // Toast config
@@ -31,6 +40,7 @@ const Login = () => {
     setFlag(true);
     const email = e.target.email.value;
     const password = e.target.password.value;
+
     if (email === "" || password === "") {
       Toast.fire({
         icon: "error",
@@ -47,7 +57,7 @@ const Login = () => {
           title: `Welcome ${user2.user.displayName}`,
         });
         setFlag(false);
-        navg(location.state ? location.state : "/");
+        navigate(location.state?.from || "/");
       })
       .catch((error) => {
         Toast.fire({
@@ -66,13 +76,13 @@ const Login = () => {
           icon: "success",
           title: `Welcome ${user2.user.displayName}`,
         });
-        const user = { email: user2.user.email, role: "User" };
+        const userDoc = { email: user2.user.email, role: "User" };
         axios
-          .post("https://skillpath-bay.vercel.app/users", user)
+          .post("http://localhost:5000/users", userDoc)
           .then((res) => console.log(res.data))
           .catch((error) => console.log(error));
 
-        navg(location.state ? location.state : "/");
+        navigate(location.state?.from || "/");
       })
       .catch((error) => {
         Toast.fire({

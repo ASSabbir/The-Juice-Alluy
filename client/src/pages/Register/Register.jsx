@@ -1,5 +1,5 @@
-import { useNavigate, NavLink } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./../../providers/AuthContext";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -9,12 +9,19 @@ import { Typewriter } from "react-simple-typewriter";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaImage } from "react-icons/fa";
 
 const Register = () => {
-  const { handelSignup, googleSign } = useContext(AuthContext);
+  const { handelSignup, googleSign, user } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [flag, setFlag] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const navg = useNavigate();
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   // Toast
   const Toast = Swal.mixin({
@@ -87,11 +94,15 @@ const Register = () => {
               });
 
               // Save user to DB
-              const user = { email };
-              axios.post("https://skillpath-bay.vercel.app/users", user);
+              const userDoc = { username, email, photoURL: url };
+              axios
+                .post("http://localhost:5000/users", userDoc)
+                .then((res) => console.log(res.data))
+                .catch((error) => console.log(error));
 
               setFlag(false);
-              navg("/");
+              navigate(location.state?.from || "/");
+
             })
             .catch((err) => console.log(err));
         })
@@ -110,10 +121,13 @@ const Register = () => {
           icon: "success",
           title: `Welcome ${user2.user.displayName}`,
         });
-        const user = { email: user2.user.email };
-        axios.post("https://skillpath-bay.vercel.app/users", user);
+        const userDoc = { email: user2.user.email, };
+        axios
+          .post("http://localhost:5000/users", userDoc)
+          .then((res) => console.log(res.data))
+          .catch((error) => console.log(error));
 
-        navg("/");
+        navigate(location.state?.from || "/");
       })
       .catch((error) => {
         Toast.fire({ icon: "error", title: error.code });
@@ -145,7 +159,7 @@ const Register = () => {
           />
         </h2>
         <p className="text-gray-400 text-center mb-8 italic">
-          "Every sip begins with a story — let’s start yours today."
+          "Every sip begins with a story — let's start yours today."
         </p>
 
         <form onSubmit={handleFormSubmit} className="space-y-6">

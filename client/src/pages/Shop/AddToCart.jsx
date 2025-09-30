@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaCoffee, FaDollarSign, FaTrashAlt } from "react-icons/fa";
+import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 
 const AddToCart = () => {
   const [cart, setCart] = useState([]);
+  const [coupon, setCoupon] = useState("");
+  const [discount, setDiscount] = useState(0);
 
-  //Fetch Cart Items from MongoDB
+  // Fetch Cart
   const fetchCart = async () => {
     try {
       const res = await axios.get("http://localhost:5000/cart");
@@ -20,93 +22,214 @@ const AddToCart = () => {
     fetchCart();
   }, []);
 
-  //Handle Order Now (Remove from LocalStorage + DB)
-  const handleOrderNow = async (id, name) => {
-  try {
-    // Remove from LocalStorage
-    let localCart = JSON.parse(localStorage.getItem("cart")) || [];
-    localCart = localCart.filter((item) => item._id !== id);
-    localStorage.setItem("cart", JSON.stringify(localCart));
+  // Update Quantity
+  const updateQuantity = (id, change) => {
+    const updatedCart = cart.map((item) =>
+      item._id === id
+        ? { ...item, quantity: Math.max(1, (item.quantity || 1) + change) }
+        : item
+    );
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
 
-    // Remove from MongoDB
-    await axios.delete(`http://localhost:5000/cart/${id}`);
+  // Delete Item
+  const handleDelete = async (id) => {
+    try {
+      // remove from LocalStorage
+      let localCart = JSON.parse(localStorage.getItem("cart")) || [];
+      localCart = localCart.filter((item) => item._id !== id);
+      localStorage.setItem("cart", JSON.stringify(localCart));
 
-    // Update UI
-    setCart(cart.filter((item) => item._id !== id));
+      // remove from MongoDB
+      await axios.delete(`http://localhost:5000/cart/${id}`);
 
-      Swal.fire({
-        icon: "success",
-        title: "Order Placed!",
-        text: `${name} has been successfully ordered.`,
-        background: "#1a1a1a",
-        color: "#d2a679",
-        confirmButtonColor: "#d2a679",
-      });
+      // update UI
+      setCart(cart.filter((item) => item._id !== id));
+
+      Swal.fire("Deleted!", "Item has been removed.", "success");
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Order Failed",
-        text: "Something went wrong!",
-      });
+      Swal.fire("Error!", "Something went wrong.", "error");
     }
   };
-  console.log(cart)
+
+  // Subtotal
+  const subtotal = cart.reduce(
+    (acc, item) => acc + item.price * (item.quantity || 1),
+    0
+  );
+
+  // VAT 2%
+  const vat = subtotal * 0.02;
+
+  // Apply Coupon
+  const applyCoupon = () => {
+    if (coupon.toLowerCase() === "firstorder") {
+      setDiscount(subtotal * 0.05);
+      Swal.fire("Coupon Applied!", "5% discount applied!", "success");
+    } else {
+      setDiscount(0);
+      Swal.fire("Invalid Coupon", "Try again.", "error");
+    }
+  };
+
+  // Grand Total
+  const grandTotal = subtotal + vat - discount;
+
+  // Pay Now
+  const handlePayNow = () => {
+    Swal.fire({
+      title: "Payment Successful",
+      text: "Thank you for your order!",
+      icon: "success",
+      confirmButtonText: "Go to Home",
+      confirmButtonColor: "#d2a679",
+    }).then(() => {
+      window.location.href = "/";
+    });
+  };
+
   return (
-    <div className="bg-[#0f0f0f] min-h-screen px-6 py-16">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-center text-[#d2a679] mb-12">
-          ☕ Your Coffee Cart
-        </h1>
+    <div className="text-white min-h-screen">
+      {/* Banner */}
+      <div className="relative bg-backgrondDark h-80 flex flex-col justify-center items-center">
+        <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/bottom-fire-img1.png')] bg-bottom bg-no-repeat bg-cover filter"></div>
+        <h2 className="relative text-5xl text-center font-moglan text-white">
+          Your Cart
+        </h2>
+        <div className="breadcrumbs text-white font-urbanist mt-4 relative">
+          <ul>
+            <li>
+              <a href="/">Home</a>
+            </li>
+            <li>Cart</li>
+          </ul>
+        </div>
+      </div>
 
-        {cart.length === 1 ? (
-          <p className="text-center text-gray-400 italic">
-            Your cart is empty. Add some coffee to enjoy! ☕
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cart.map((item) => (
-              <div
-                key={item._id}
-                className="bg-[#1a1a1a] rounded-2xl shadow-lg hover:shadow-[#d2a679]/50 
-                           hover:scale-[1.02] transition duration-300 flex flex-col overflow-hidden"
-              >
-                {/* Image */}
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-t-2xl"
-                />
-
-                {/* Content */}
-                <div className="p-5 flex flex-col flex-grow">
-                  <h2 className="text-2xl font-bold text-[#d2a679] flex items-center gap-2 mb-2">
-                    <FaCoffee /> {item.name}
-                  </h2>
-                  <p className="text-gray-300 text-sm flex-grow">
-                    {item.description > 100
-                      ? item.description.slice(0, 100) + "..."
-                      : item.description}
-                  </p>
-
-                  {/* Price */}
-                  <p className="text-lg font-semibold mt-4 text-[#b58855] flex items-center gap-2">
-                    <FaDollarSign /> {item.price}
-                  </p>
-
-                  {/* Order Now Button */}
-                  <button
-                    onClick={() => handleOrderNow(item._id, item.name)}
-                    className="btn mt-5 bg-gradient-to-r from-[#d2a679] to-[#b58855] 
-                               text-black border-none shadow-md hover:shadow-xl 
-                               hover:scale-105 transition duration-300 flex items-center gap-2"
+      {/* Cart Section */}
+      <div className="mt-[5vw] px-[9vw] grid grid-cols-1 lg:grid-cols-3 gap-10 pb-24">
+        {/* LEFT - Cart Items */}
+        <div className="lg:col-span-2 bg-[#1a1a1a] rounded-xl p-6 shadow-lg">
+          <h2 className="text-2xl font-bold text-[#d2a679] mb-6">Cart Items</h2>
+          {cart.length === 0 ? (
+            <p className="text-gray-400 italic">Your cart is empty</p>
+          ) : (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="text-[#d2a679] border-b border-gray-700">
+                  <th className="p-3">Item</th>
+                  <th className="p-3">Price</th>
+                  <th className="p-3">Quantity</th>
+                  <th className="p-3">Total</th>
+                  <th className="p-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cart.map((item) => (
+                  <tr
+                    key={item._id}
+                    className="border-b border-gray-700 hover:bg-[#2a2a2a]"
                   >
-                    <FaTrashAlt /> Order Now
-                  </button>
-                </div>
-              </div>
-            ))}
+                    <td className="p-3 flex items-center gap-3">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-14 h-14 rounded-lg object-cover"
+                      />
+                      {item.name}
+                    </td>
+                    <td className="p-3">${item.price.toFixed(2)}</td>
+                    <td className="p-3 flex items-center gap-3">
+                      <button
+                        onClick={() => updateQuantity(item._id, -1)}
+                        className="bg-[#d2a679] text-black px-2 py-1 rounded-full hover:scale-110"
+                      >
+                        <FaMinus />
+                      </button>
+                      {item.quantity || 1}
+                      <button
+                        onClick={() => updateQuantity(item._id, 1)}
+                        className="bg-[#d2a679] text-black px-2 py-1 rounded-full hover:scale-110"
+                      >
+                        <FaPlus />
+                      </button>
+                    </td>
+                    <td className="p-3">
+                      ${(item.price * (item.quantity || 1)).toFixed(2)}
+                    </td>
+                    <td className="p-3">
+                      <button
+                        onClick={() => handleDelete(item._id)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg flex items-center gap-2"
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* RIGHT - Summary */}
+        <div className="bg-[#1a1a1a] rounded-xl shadow-2xl p-6 border-4 border-[#d2a679] relative">
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#d2a679] text-black px-6 py-2 rounded-full font-bold shadow-lg">
+            Coffee Shop Voucher
           </div>
-        )}
+          <h3 className="text-2xl font-bold text-center text-[#d2a679] mt-6 mb-6">
+            Order Summary
+          </h3>
+
+          <div className="space-y-3 text-gray-300">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>VAT (2%)</span>
+              <span>${vat.toFixed(2)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-green-400">
+                <span>Discount (5%)</span>
+                <span>- ${discount.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Coupon */}
+          <div className="mt-5 flex">
+            <input
+              type="text"
+              placeholder="Enter coupon code"
+              className="flex-grow px-3 py-2 rounded-l-lg bg-gray-800 border border-[#d2a679] text-white"
+              value={coupon}
+              onChange={(e) => setCoupon(e.target.value)}
+            />
+            <button
+              onClick={applyCoupon}
+              className="px-4 py-2 bg-[#d2a679] text-black font-bold rounded-r-lg hover:bg-[#b58855]"
+            >
+              Apply
+            </button>
+          </div>
+
+          {/* Grand Total */}
+          <div className="mt-6 flex justify-between text-xl font-bold text-[#d2a679] border-t border-gray-700 pt-3">
+            <span>Grand Total</span>
+            <span>${grandTotal.toFixed(2)}</span>
+          </div>
+
+          {/* Pay Now */}
+          <button
+            onClick={handlePayNow}
+            className="w-full mt-6 bg-gradient-to-r from-[#d2a679] to-[#b58855] text-black font-bold py-3 rounded-lg hover:scale-105 transition"
+          >
+            Pay Now
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import Card from "../../components/card/Card";
-import banner from '/business-banner.jpg'
+
 
 const Shop = () => {
   const [coffees, setCoffees] = useState([]);
@@ -44,7 +44,7 @@ const Shop = () => {
             <option disabled={true}>Default sorting</option>
             <option>Sort by Price</option>
             <option>Sort by Review</option>
-            
+
           </select>
         </div>
         <div className="grid bg-[#1a1a1a]  grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">

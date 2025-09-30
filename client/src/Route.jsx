@@ -9,7 +9,11 @@ import Shop from "./pages/Shop/Shop";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import CoffeeDetails from "./pages/Shop/CoffeeDetails";
-import AddToCart from "./pages/Shop/AddToCart";
+
+import AdminDashboard from "./components/dashboard/AdminDashboard";
+import AddProduct from "./components/dashboard/Admin/AddProduct/AddProduct";
+import AddToCart from './pages/Shop/AddToCart';
+import UserProfile from "./components/dashboard/User/UserProfile";
 
 
 export const Route = createBrowserRouter([
@@ -39,6 +43,19 @@ export const Route = createBrowserRouter([
             path:"/cart",
             element:<AddToCart/>
         },
+
+        {
+            path:"/dashboard",
+            element:<AdminDashboard/>
+        },
+        {
+            path:"/profile",
+            element: <UserProfile></UserProfile>
+        },
+        {
+            path:"/add-coffee",
+            element:<AddProduct/>
+        }
 
 
     ]
