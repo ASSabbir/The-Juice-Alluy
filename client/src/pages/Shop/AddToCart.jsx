@@ -67,7 +67,7 @@ const AddToCart = () => {
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="bg-[#1a1a1a] rounded-2xl shadow-lg hover:shadow-[#d2a679]/50 
+                className="bg-[#1a1a1a] rounded-2xl shadow-lg hover:shadow-[#d2a679]/50
                            hover:scale-[1.02] transition duration-300 flex flex-col overflow-hidden"
               >
                 {/* Image */}
@@ -96,8 +96,8 @@ const AddToCart = () => {
                   {/* Order Now Button */}
                   <button
                     onClick={() => handleOrderNow(item._id, item.name)}
-                    className="btn mt-5 bg-gradient-to-r from-[#d2a679] to-[#b58855] 
-                               text-black border-none shadow-md hover:shadow-xl 
+                    className="btn mt-5 bg-gradient-to-r from-[#d2a679] to-[#b58855]
+                               text-black border-none shadow-md hover:shadow-xl
                                hover:scale-105 transition duration-300 flex items-center gap-2"
                   >
                     <FaTrashAlt /> Order Now

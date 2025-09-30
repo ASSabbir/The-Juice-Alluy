@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import axios from "axios";
-
-// replace with real auth from context (Billa Do This)
-const isLoggedIn = false;
+import { AuthContext } from "../providers/AuthContext";
+import Swal from "sweetalert2";
 
 const Nav = () => {
+  const { user, logout } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
@@ -24,7 +24,32 @@ const Nav = () => {
     fetchCart();
   }, []);
 
-  // handeling the sticky navber animation 
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
+  const handleLogOut = () => {
+    logout()
+      .then(() => {
+        Toast.fire({
+          icon: "success",
+          title: `Bye See You Again`,
+        });
+        setCartCount(0); // Reset cart count on logout
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  // handeling the sticky navber animation
   useEffect(() => {
     const handelScrolling = () => {
       const currentScrollState = window.scrollY;
@@ -60,7 +85,7 @@ const Nav = () => {
           Shop
         </NavLink>
       </li>
-      {!isLoggedIn && (
+      {!user && (
         <>
           <li>
             <NavLink
@@ -80,15 +105,25 @@ const Nav = () => {
           </li>
         </>
       )}
-      {isLoggedIn && (
-        <li>
-          <NavLink
-            to="/profile"
-            className="px-4 py-2 hover:bg-[#d2a679]/20 rounded-md transition duration-300 flex items-center gap-2"
-          >
-            <FaUserCircle /> Profile
-          </NavLink>
-        </li>
+      {user && (
+        <>
+          <li>
+            <NavLink
+              to="/profile"
+              className="px-4 py-2 hover:bg-[#d2a679]/20 rounded-md transition duration-300 flex items-center gap-2"
+            >
+              <FaUserCircle /> Profile
+            </NavLink>
+          </li>
+          <li>
+            <button
+              onClick={handleLogOut}
+              className="px-4 py-2 hover:bg-red-600/20 rounded-md transition duration-300 text-red-400 hover:text-red-300"
+            >
+              Sign Out
+            </button>
+          </li>
+        </>
       )}
     </>
   );
