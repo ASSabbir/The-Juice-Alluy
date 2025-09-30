@@ -13,6 +13,7 @@ import CoffeeDetails from "./pages/Shop/CoffeeDetails";
 import AdminDashboard from "./components/dashboard/AdminDashboard";
 import AddProduct from "./components/dashboard/Admin/AddProduct/AddProduct";
 import AddToCart from './pages/Shop/AddToCart';
+import UserProfile from "./components/dashboard/User/UserProfile";
 
 
 export const Route = createBrowserRouter([
@@ -46,6 +47,10 @@ export const Route = createBrowserRouter([
         {
             path:"/dashboard",
             element:<AdminDashboard/>
+        },
+        {
+            path:"/profile",
+            element: <UserProfile></UserProfile>
         },
         {
             path:"/add-coffee",
