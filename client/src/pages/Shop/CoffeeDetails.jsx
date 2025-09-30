@@ -6,7 +6,8 @@ import Swal from "sweetalert2";
 const CoffeeDetails = () => {
   const { id } = useParams();
   const [coffee, setCoffee] = useState(null);
-
+  const [activeTab, setActiveTab] = useState("description");
+  const [quantity, setQuantity] = useState(1);
   useEffect(() => {
     const getCoffee = async () => {
       try {
@@ -52,52 +53,169 @@ const CoffeeDetails = () => {
     }
   };
 
-  if (!coffee) return <p className="text-center mt-10 text-white">Loading...</p>;
+  if (!coffee)
+    return <p className="text-center mt-10 text-white">Loading...</p>;
 
   return (
-    <div className="bg-[#0f0f0f] min-h-screen px-6 py-16">
-      <div className="max-w-5xl mx-auto">
-        <div className="card lg:card-side bg-[#1a1a1a] shadow-2xl rounded-2xl overflow-hidden hover:scale-[1.02] hover:shadow-[#d2a679] transition duration-500">
-          {/* Image */}
-          <figure className="lg:w-1/2">
+    <div className="bg-[#0f0f0f] min-h-screen">
+      <div className="relative bg-backgrondDark h-96 flex flex-col justify-center items-center">
+        <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/business-banner.jpg')] bg-bottom bg-no-repeat bg-cover filter grayscale"></div>
+        <h2 className="relative text-5xl text-center font-moglan text-white">
+          Our Menu
+        </h2>
+      </div>
+
+      {/* Product Details Section */}
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="bg-backgrondLight flex items-center justify-center p-12 rounded-lg">
             <img
               src={coffee.image}
               alt={coffee.name}
-              className="w-full h-80 lg:h-full object-cover"
+              className="max-w-full h-auto object-contain"
             />
-          </figure>
+          </div>
 
-          {/* Details */}
-          <div className="card-body text-white lg:w-1/2">
-            <h2 className="card-title text-3xl font-extrabold text-[#d2a679] mb-4">
-              {coffee.name}
-            </h2>
-            <p className="text-gray-300 mb-3">{coffee.description}</p>
+          <div className="text-white space-y-6">
+            {/* Description Text */}
+            <p className="text-text-tertiary text-base leading-relaxed">
+              {coffee.description}
+            </p>
 
-            <div className="space-y-2 text-sm">
-              <p><span className="font-bold text-[#d2a679]">Region:</span> {coffee.region}</p>
-              <p><span className="font-bold text-[#d2a679]">Weight:</span> {coffee.weight}</p>
-              <p><span className="font-bold text-[#d2a679]">Flavor:</span> {coffee.flavor_profile?.join(", ")}</p>
-              <p><span className="font-bold text-[#d2a679]">Roast Level:</span> {coffee.roast_level}</p>
-              <p><span className="font-bold text-[#d2a679]">Ingredients:</span> {coffee.ingredients?.join(", ")}</p>
-              <p><span className="font-bold text-[#d2a679]">Health Benefit:</span> {coffee.health_benefit}</p>
-              <p><span className="font-bold text-[#d2a679]">Making Process:</span> {coffee.making_process}</p>
-              <p className="text-lg font-semibold mt-3">
-                <span className="text-[#d2a679]">Price:</span> ${coffee.price}
-              </p>
+            {/* Reviews */}
+            <div className="flex items-center gap-2">
+              <div className="flex text-yellow-500">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i}>★</span>
+                ))}
+              </div>
+              <span className="text-sm text-gray-400">(1 customer review)</span>
             </div>
 
-            <div className="card-actions mt-6">
-              <button className="btn bg-[#d2a679] text-black border-none hover:bg-[#b58855] shadow-md">
-                Order Now
-              </button>
+            {/* Price */}
+            <div className="text-2xl font-bold text-white">${coffee.price}</div>
+
+            {/* Add to Cart Section */}
+            <div className="flex items-center gap-4">
               <button
-                onClick={()=>handleAddToCart(coffee)}
-                className="btn bg-black text-[#d2a679] border-none hover:bg-[#2a1a0a] shadow-md"
+                onClick={handleAddToCart}
+                className="flex-1 bg-gradient-to-r from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
               >
                 Add to Cart
               </button>
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                className="w-20 bg-darkCoffee border border-gray-600 text-white text-center py-3 rounded"
+              />
             </div>
+            <button
+                onClick={handleAddToCart}
+                className="flex-1 bg-gradient-to-r w-full from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
+              >
+                Order Now
+              </button>
+
+            {/*  Categories */}
+            <div className="space-y-2 text-sm border-t border-gray-700 pt-6">
+              <p className="text-gray-400">
+                <span className="font-semibold">Categories:</span>{" "}
+                {coffee.region}, {coffee.roast_level}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div className="mt-16">
+          {/* Tab Headers */}
+          <div className="border-b border-gray-700">
+            <div className="flex gap-8">
+              <button
+                onClick={() => setActiveTab("description")}
+                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${
+                  activeTab === "description"
+                    ? "text-heading-secondary border-b-2 border-[#d2a679]"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Description
+              </button>
+              <button
+                onClick={() => setActiveTab("additional")}
+                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${
+                  activeTab === "additional"
+                    ? "text-heading-secondary border-b-2 border-[#d2a679]"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Additional Information
+              </button>
+              <button
+                onClick={() => setActiveTab("reviews")}
+                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${
+                  activeTab === "reviews"
+                    ? "text-heading-secondary border-b-2 border-[#d2a679]"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Reviews (1)
+              </button>
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="py-8 text-text-tertiary">
+            {activeTab === "description" && (
+              <div className="space-y-4">
+                <p className="leading-relaxed">{coffee.description}</p>
+                <div className="mt-6 space-y-2">
+                  <p>
+                    <span className="font-bold text-heading-secondary">
+                      Making Process:
+                    </span>{" "}
+                    {coffee.making_process}
+                  </p>
+                  <p>
+                    <span className="font-bold text-heading-secondary">
+                      Health Benefit:
+                    </span>{" "}
+                    {coffee.health_benefit}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "additional" && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-4 max-w-2xl">
+                  <p className="font-bold text-heading-secondary">Region:</p>
+                  <p>{coffee.region}</p>
+
+                  <p className="font-bold text-heading-secondary">Weight:</p>
+                  <p>{coffee.weight}</p>
+
+                  <p className="font-bold text-heading-secondary">Roast Level:</p>
+                  <p>{coffee.roast_level}</p>
+
+                  <p className="font-bold text-heading-secondary">Flavor Profile:</p>
+                  <p>{coffee.flavor_profile?.join(", ")}</p>
+
+                  <p className="font-bold text-heading-secondary">Ingredients:</p>
+                  <p>{coffee.ingredients?.join(", ")}</p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "reviews" && (
+              <div>
+                <p className="text-gray-400 italic">
+                  No reviews yet. Be the first to review this product!
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
