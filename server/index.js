@@ -58,6 +58,28 @@ async function run() {
       res.send(result);
     });
 
+    // Update user by email
+app.put('/users/:email', async (req, res) => {
+  const email = req.params.email;
+  const updatedUser = req.body;
+  const filter = { email: email };
+  const updateDoc = {
+    $set: {
+      displayName: updatedUser.displayName,
+      photoURL: updatedUser.photoURL,
+      role: updatedUser.role,
+    },
+  };
+  const result = await usersCollections.updateOne(filter, updateDoc, {
+    upsert: true,
+  });
+  res.send(result);
+});
+
+
+
+
+
     // Add item to cart
     app.post('/cart', async (req, res) => {
   try {

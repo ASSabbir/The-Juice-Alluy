@@ -161,7 +161,7 @@ const AddToCart = () => {
                     <td className="p-3">
                       <button
                         onClick={() => handleDelete(item._id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg flex items-center gap-2"
+                        className="bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded-lg flex items-center gap-2"
                       >
                         <FaTrash /> Delete
                       </button>
