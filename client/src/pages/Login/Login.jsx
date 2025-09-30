@@ -19,6 +19,7 @@ const Login = () => {
       navigate("/");
     }
   }, [user, navigate]);
+  const navg = useNavigate();
 
   // Toast config
   const Toast = Swal.mixin({
@@ -59,7 +60,6 @@ const Login = () => {
         navigate(location.state?.from || "/");
       })
       .catch((error) => {
-        console.log(error);
         Toast.fire({
           icon: "error",
           title: error.code,
@@ -89,27 +89,26 @@ const Login = () => {
           icon: "error",
           title: error.code,
         });
-        console.log(error);
       });
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex flex-col lg:flex-row items-center justify-center px-6 py-16">
-      {/* Left Side Image */}
-      <div className="hidden lg:flex lg:w-1/2 justify-center items-center">
-        <img
-          src="https://images.unsplash.com/photo-1509042239860-f550ce710b93"
-          alt="Coffee Cup"
-          className="rounded-2xl shadow-2xl w-4/5 hover:scale-105 transition duration-500"
-        />
-      </div>
+    <div
+      className="min-h-screen w-full flex items-center justify-center relative bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1509042239860-f550ce710b93')",
+      }}
+    >
+      {/* Dark Shadow Overlay */}
+      <div className="absolute inset-0 bg-black/50"></div>
 
-      {/* Right Side Form */}
-      <div className="w-full max-w-md bg-[#1a1a1a] rounded-2xl shadow-2xl p-8 relative z-10">
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md bg-black/20 backdrop-blur-md rounded-2xl shadow-2xl p-8 mx-4 my-32">
         {/* Typewriter Heading */}
         <h2 className="text-3xl font-extrabold text-center mb-6 text-[#d2a679] drop-shadow-lg">
           <Typewriter
-            words={["Welcome Back ☕", "Login to Your Coffee Journey ❤️"]}
+            words={["Welcome Back", "Login to Your Coffee Journey"]}
             loop={true}
             cursor
             cursorStyle="|"
@@ -120,7 +119,7 @@ const Login = () => {
         </h2>
 
         {/* Motivation Text */}
-        <p className="text-gray-400 text-center mb-8 italic">
+        <p className="text-gray-300 text-center mb-8 italic">
           "Start your day with a cup of happiness — login to continue."
         </p>
 
@@ -128,8 +127,8 @@ const Login = () => {
         <form onSubmit={handelSubmit} className="space-y-6">
           {/* Email */}
           <div>
-            <label className="block text-gray-300 mb-2">Email Address</label>
-            <div className="flex items-center bg-[#0f0f0f] border border-[#333] rounded-xl px-4">
+            <label className="block text-gray-200 mb-2">Email Address</label>
+            <div className="flex items-center bg-black/50 border border-[#444] rounded-xl px-4">
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
                 type="email"
@@ -142,8 +141,8 @@ const Login = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-gray-300 mb-2">Password</label>
-            <div className="flex items-center bg-[#0f0f0f] border border-[#333] rounded-xl px-4">
+            <label className="block text-gray-200 mb-2">Password</label>
+            <div className="flex items-center bg-black/50 border border-[#444] rounded-xl px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showPassword ? "text" : "password"}
@@ -183,21 +182,21 @@ const Login = () => {
         </form>
 
         {/* Google login */}
-        <div className="flex items-center pt-4 space-x-1">
+        <div className="flex items-center pt-6 space-x-1">
           <div className="flex-1 h-px bg-gray-500"></div>
           <p className="px-3 text-sm text-gray-400">Or login with</p>
           <div className="flex-1 h-px bg-gray-500"></div>
         </div>
-        <div className="flex justify-center mt-3">
+        <div className="flex justify-center mt-4">
           <button
             onClick={handelgoogle}
             aria-label="Log in with Google"
-            className="p-3 rounded-full bg-white hover:bg-gray-200"
+            className="relative group p-3 rounded-full shadow-lg hover:scale-110 transition"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
-              className="w-6 h-6"
+              className="w-8 h-8"
             >
               <path
                 fill="#4285F4"
@@ -208,8 +207,8 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-400 mt-6">
-          Don't have an account?{" "}
+        <p className="text-center text-gray-300 mt-6">
+          Don’t have an account?{" "}
           <NavLink
             to="/register"
             className="text-[#d2a679] hover:underline cursor-pointer"

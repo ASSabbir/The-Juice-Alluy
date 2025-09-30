@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import Card from "../../components/card/Card";
-import banner from '/business-banner.jpg'
+
 
 const Shop = () => {
   const [coffees, setCoffees] = useState([]);
