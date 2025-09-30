@@ -8,11 +8,11 @@ const Root = () => {
     return (
         <div className='font-urbanist  text-lightCoffee bg-backgrondLight '>
             <Nav></Nav>
-            <Curser></Curser>
+            {/* <Curser></Curser> */}
             <Outlet></Outlet>
 
 
-            <ReactLenis
+            {/* <ReactLenis
                 root
                 options={{
                     duration: 1.2,        
@@ -24,7 +24,7 @@ const Root = () => {
                     wheelMultiplier: 1.5,    
                     infinite: false,       
                 }}
-            />
+            /> */}
         </div>
     );
 };

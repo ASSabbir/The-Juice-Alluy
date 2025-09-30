@@ -5,7 +5,7 @@ import { GoClock } from "react-icons/go";
 
 const AboutUs = () => {
     return (
-        <div className={`h-screen bg-[url('/bg-2.jpg')]  w-full  bg-center`}>
+        <div className={`min-h-screen flex  items-center bg-[url('/bg-2.jpg')]  w-full  bg-center`}>
             <div className="flex justify-between flex-col md:flex-row items-center h-full px-[12vw]">
                 
                 <div className="   md:w-1/2">
