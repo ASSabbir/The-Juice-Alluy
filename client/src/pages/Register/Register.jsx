@@ -1,13 +1,12 @@
 import { useNavigate, NavLink } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "./../../providers/AuthContext";
-import { useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { updateProfile } from "firebase/auth";
 import { auth } from "./../../components/firebase/firebase.config";
 import { Typewriter } from "react-simple-typewriter";
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaImage } from "react-icons/fa";
 
 const Register = () => {
   const { handelSignup, googleSign } = useContext(AuthContext);
@@ -17,7 +16,7 @@ const Register = () => {
 
   const navg = useNavigate();
 
-  // Toast setup
+  // Toast
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -30,7 +29,6 @@ const Register = () => {
     },
   });
 
-  // Form submit
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setFlag(true);
@@ -38,18 +36,11 @@ const Register = () => {
     const formData = new FormData();
     const username = e.target.username.value;
     const email = e.target.email.value;
-    const role = e.target.role.value;
     const password = e.target.password.value;
     const confirm = e.target.confirm.value;
     const photoFile = e.target.photo.files[0];
 
-    if (
-      username === "" ||
-      email === "" ||
-      password === "" ||
-      confirm === "" ||
-      !photoFile
-    ) {
+    if (username === "" || email === "" || password === "" || confirm === "" || !photoFile) {
       Toast.fire({ icon: "error", title: "All fields must be filled out." });
       setFlag(false);
       return;
@@ -96,14 +87,11 @@ const Register = () => {
               });
 
               // Save user to DB
-              const user = { email, role };
-              axios
-                .post("https://skillpath-bay.vercel.app/users", user)
-                .then((res) => console.log(res.data))
-                .catch((error) => console.log(error));
+              const user = { email };
+              axios.post("https://skillpath-bay.vercel.app/users", user);
 
               setFlag(false);
-              navg(location.state ? location.state : "/");
+              navg("/");
             })
             .catch((err) => console.log(err));
         })
@@ -122,13 +110,10 @@ const Register = () => {
           icon: "success",
           title: `Welcome ${user2.user.displayName}`,
         });
-        const user = { email: user2.user.email, role: "User" };
-        axios
-          .post("https://skillpath-bay.vercel.app/users", user)
-          .then((res) => console.log(res.data))
-          .catch((error) => console.log(error));
+        const user = { email: user2.user.email };
+        axios.post("https://skillpath-bay.vercel.app/users", user);
 
-        navg(location.state ? location.state : "/");
+        navg("/");
       })
       .catch((error) => {
         Toast.fire({ icon: "error", title: error.code });
@@ -136,24 +121,21 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex flex-col lg:flex-row items-center justify-center px-6 py-16">
-      {/* Left Image */}
-      <div className="hidden lg:flex lg:w-1/2 justify-center items-center">
-        <img
-          src="https://images.unsplash.com/photo-1511920170033-f8396924c348"
-          alt="Coffee Art"
-          className="rounded-2xl shadow-2xl w-4/5 hover:scale-105 transition duration-500"
-        />
-      </div>
+    <div
+      className="min-h-screen flex items-center justify-center relative bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1511920170033-f8396924c348')",
+      }}
+    >
+      {/* Dark Shadow Overlay */}
+      <div className="absolute inset-0 bg-black/50"></div>
 
-      {/* Right Form */}
-      <div className="w-full max-w-md bg-[#1a1a1a] rounded-2xl shadow-2xl p-8 relative z-10">
+      {/* Register Card */}
+      <div className="relative w-full max-w-md bg-black/20 backdrop-blur-md rounded-2xl shadow-2xl p-8 z-10 my-32">
         <h2 className="text-3xl font-extrabold text-center mb-6 text-[#d2a679] drop-shadow-lg">
           <Typewriter
-            words={[
-              "Create Your Coffee Account ☕",
-              "Join the Coffee Lovers Family ❤️",
-            ]}
+            words={["Create Your Coffee Account", "Join the Coffee Lovers Family"]}
             loop={true}
             cursor
             cursorStyle="|"
@@ -170,7 +152,7 @@ const Register = () => {
           {/* Name */}
           <div>
             <label className="block text-gray-300 mb-2">Full Name</label>
-            <div className="flex items-center bg-[#0f0f0f] border border-[#333] rounded-xl px-4">
+            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
               <FaUser className="text-[#d2a679] mr-3" />
               <input
                 type="text"
@@ -184,7 +166,7 @@ const Register = () => {
           {/* Email */}
           <div>
             <label className="block text-gray-300 mb-2">Email Address</label>
-            <div className="flex items-center bg-[#0f0f0f] border border-[#333] rounded-xl px-4">
+            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
                 type="email"
@@ -195,24 +177,10 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Role */}
-          <div>
-            <label className="block text-gray-300 mb-2">Role</label>
-            <select
-              name="role"
-              defaultValue="User"
-              className="w-full py-3 px-3 rounded-xl bg-[#0f0f0f] text-gray-300 border border-[#333] focus:outline-none"
-            >
-              <option>User</option>
-
-              <option>Admin</option>
-            </select>
-          </div>
-
           {/* Password */}
           <div>
             <label className="block text-gray-300 mb-2">Password</label>
-            <div className="flex items-center bg-[#0f0f0f] border border-[#333] rounded-xl px-4">
+            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showPassword ? "text" : "password"}
@@ -233,7 +201,7 @@ const Register = () => {
           {/* Confirm Password */}
           <div>
             <label className="block text-gray-300 mb-2">Confirm Password</label>
-            <div className="flex items-center bg-[#0f0f0f] border border-[#333] rounded-xl px-4">
+            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showConfirm ? "text" : "password"}
@@ -251,14 +219,17 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Photo */}
+          {/* Upload Photo */}
           <div>
             <label className="block text-gray-300 mb-2">Upload Photo</label>
-            <input
-              type="file"
-              name="photo"
-              className="file-input file-input-bordered w-full text-white bg-[#0f0f0f] border border-[#333]"
-            />
+            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
+              <FaImage className="text-[#d2a679] mr-3" />
+              <input
+                type="file"
+                name="photo"
+                className="w-full py-3 text-gray-300 bg-transparent focus:outline-none"
+              />
+            </div>
           </div>
 
           {/* Submit */}
