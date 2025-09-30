@@ -26,7 +26,7 @@ const CoffeeDetails = () => {
 
     // Save to LocalStorage
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const exists = cart.find((item) => item.id === coffee.id);
+    const exists = cart.find((item) => item._id === coffee._id);
     if (!exists) {
       cart.push(coffee);
       localStorage.setItem("cart", JSON.stringify(cart));
@@ -92,7 +92,7 @@ const CoffeeDetails = () => {
                 Order Now
               </button>
               <button
-                onClick={handleAddToCart}
+                onClick={()=>handleAddToCart(coffee)}
                 className="btn bg-black text-[#d2a679] border-none hover:bg-[#2a1a0a] shadow-md"
               >
                 Add to Cart

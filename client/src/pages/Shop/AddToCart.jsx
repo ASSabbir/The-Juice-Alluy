@@ -50,7 +50,7 @@ const AddToCart = () => {
       });
     }
   };
-
+  console.log(cart)
   return (
     <div className="bg-[#0f0f0f] min-h-screen px-6 py-16">
       <div className="max-w-6xl mx-auto">
@@ -58,7 +58,7 @@ const AddToCart = () => {
           ☕ Your Coffee Cart
         </h1>
 
-        {cart.length === 0 ? (
+        {cart.length === 1 ? (
           <p className="text-center text-gray-400 italic">
             Your cart is empty. Add some coffee to enjoy! ☕
           </p>
