@@ -107,15 +107,7 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-md bg-black/20 backdrop-blur-md rounded-2xl shadow-2xl p-8 mx-4 my-32">
         {/* Typewriter Heading */}
         <h2 className="text-3xl font-extrabold text-center mb-6 text-[#d2a679] drop-shadow-lg">
-          <Typewriter
-            words={["Welcome Back", "Login to Your Coffee Journey"]}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={80}
-            deleteSpeed={50}
-            delaySpeed={2000}
-          />
+          Login
         </h2>
 
         {/* Motivation Text */}
