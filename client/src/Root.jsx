@@ -1,10 +1,30 @@
 
 import { Outlet } from 'react-router-dom';
-
+import Nav from './components/Nav';
+import Curser from './components/Curser';
+import { ReactLenis, useLenis } from 'lenis/react'
 const Root = () => {
+    
     return (
-        <div>
+        <div className='font-urbanist  text-lightCoffee bg-backgrondLight '>
+            <Nav></Nav>
+            {/* <Curser></Curser> */}
             <Outlet></Outlet>
+
+
+            {/* <ReactLenis
+                root
+                options={{
+                    duration: 1.2,        
+                    easing: (t) => 1 - Math.pow(1 - t, 3), 
+                    gestureDirection: 'both', 
+                    smoothWheel: true,    
+                    smoothTouch: true,    
+                    touchMultiplier: 1.5,  
+                    wheelMultiplier: 1.5,    
+                    infinite: false,       
+                }}
+            /> */}
         </div>
     );
 };
