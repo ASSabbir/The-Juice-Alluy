@@ -60,18 +60,18 @@ async function run() {
 
     // Add item to cart
     app.post('/cart', async (req, res) => {
-  try {
-    const cartItem = req.body;
-    if (cartItem._id) {
-      delete cartItem._id;
-    }
-    const result = await cartCollections.insertOne(cartItem);
-    res.send(result);
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    res.status(500).send({ error: "Failed to add item to cart" });
-  }
-});
+      try {
+        const cartItem = req.body;
+        if (cartItem._id) {
+          delete cartItem._id;
+        }
+        const result = await cartCollections.insertOne(cartItem);
+        res.send(result);
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        res.status(500).send({ error: "Failed to add item to cart" });
+      }
+    });
 
     // Get all cart items
     app.get('/cart', async (req, res) => {
@@ -89,18 +89,34 @@ async function run() {
 
     // Delete item from cart
     app.delete("/cart/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const result = await cartCollections.deleteOne(query);
-    res.send(result);
-  } catch (error) {
-    console.error("Error deleting from cart:", error);
-    res.status(500).send({ error: "Failed to delete item from cart" });
-  }
-});
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await cartCollections.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error("Error deleting from cart:", error);
+        res.status(500).send({ error: "Failed to delete item from cart" });
+      }
+    });
+
+
+    app.get("/best_products", async (req, res) => {
+      const result = await coffeesCollections.find({}).limit(4).toArray()
+      console.log(result)
+      res.send(result);
+    })
+
+
+
+
+
+
+
 
     console.log("Connected to MongoDB successfully!");
+
+
   } finally {
     // await client.close(); // keep connection open for server
   }
