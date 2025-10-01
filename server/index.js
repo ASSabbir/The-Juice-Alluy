@@ -32,6 +32,19 @@ async function run() {
       res.send(coffee);
     });
 
+
+    // Products add and get api
+
+    app.post('/coffee', async (req, res) => {
+      const data = req.body
+      console.log(data)
+      const result = await coffeesCollections.insertOne(data)
+      res.send(result)
+    })
+
+
+
+
     //Get single coffee by ID
     app.get('/coffee/:id', async (req, res) => {
       const id = req.params.id;
@@ -60,18 +73,18 @@ async function run() {
 
     // Add item to cart
     app.post('/cart', async (req, res) => {
-  try {
-    const cartItem = req.body;
-    if (cartItem._id) {
-      delete cartItem._id;
-    }
-    const result = await cartCollections.insertOne(cartItem);
-    res.send(result);
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    res.status(500).send({ error: "Failed to add item to cart" });
-  }
-});
+      try {
+        const cartItem = req.body;
+        if (cartItem._id) {
+          delete cartItem._id;
+        }
+        const result = await cartCollections.insertOne(cartItem);
+        res.send(result);
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        res.status(500).send({ error: "Failed to add item to cart" });
+      }
+    });
 
     // Get all cart items
     app.get('/cart', async (req, res) => {
@@ -89,16 +102,16 @@ async function run() {
 
     // Delete item from cart
     app.delete("/cart/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const result = await cartCollections.deleteOne(query);
-    res.send(result);
-  } catch (error) {
-    console.error("Error deleting from cart:", error);
-    res.status(500).send({ error: "Failed to delete item from cart" });
-  }
-});
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await cartCollections.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error("Error deleting from cart:", error);
+        res.status(500).send({ error: "Failed to delete item from cart" });
+      }
+    });
 
     console.log("Connected to MongoDB successfully!");
   } finally {

@@ -20,13 +20,13 @@ const Card = ({ coffee }) => {
         <figure className='w- h-96 overflow-hidden'>
           <img
             src={coffee.image}
-            alt={coffee.name}
+            alt={coffee.title}
             className=" w-full  h-full object-center object-cover  hover:scale-[1.09] duration-500 transition"
           />
         </figure>
       </NavLink>
       <div className=" text-white font-urbanist mt-5 px-2 space-y-3">
-        <h3 className="text-xl font-bold t">{coffee.name}</h3>
+        <h3 className="text-xl font-bold t">{coffee.title}</h3>
 
         <Rating
           style={{ maxWidth: 90 }}
@@ -40,7 +40,7 @@ const Card = ({ coffee }) => {
         </p>
 
         {/* <div className="card-actions justify-end mt-4">
-          
+
         </div> */}
       </div>
     </div>
