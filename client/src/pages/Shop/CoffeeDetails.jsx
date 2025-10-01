@@ -2,12 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { Rating, ThinStar } from '@smastrom/react-rating'
+import { TbCurrencyTaka } from "react-icons/tb";
 
 const CoffeeDetails = () => {
   const { id } = useParams();
   const [coffee, setCoffee] = useState(null);
   const [activeTab, setActiveTab] = useState("description");
   const [quantity, setQuantity] = useState(1);
+  const myStyles = {
+      itemShapes: ThinStar,
+      activeFillColor: '#dbad6a',
+      inactiveFillColor: '#fbf1a9'
+    }
+
+
   useEffect(() => {
     const getCoffee = async () => {
       try {
@@ -55,7 +64,7 @@ const CoffeeDetails = () => {
 
   if (!coffee)
     return <p className="text-center mt-10 text-white">Loading...</p>;
-
+console.log(coffee)
   return (
     <div className="bg-[#0f0f0f] min-h-screen">
       <div className="relative bg-backgrondDark h-96 flex flex-col justify-center items-center">
@@ -71,29 +80,39 @@ const CoffeeDetails = () => {
           <div className="bg-backgrondLight flex items-center justify-center p-12 rounded-lg">
             <img
               src={coffee.image}
-              alt={coffee.name}
+              alt={coffee.title}
               className="max-w-full h-auto object-contain"
             />
           </div>
 
           <div className="text-white space-y-6">
             {/* Description Text */}
+            <p className="text-3xl  font-bold text-lightCoffee">
+              {coffee.title}
+            </p>
             <p className="text-text-tertiary text-base leading-relaxed">
               {coffee.description}
             </p>
 
             {/* Reviews */}
             <div className="flex items-center gap-2">
-              <div className="flex text-yellow-500">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i}>★</span>
-                ))}
-              </div>
-              <span className="text-sm text-gray-400">(1 customer review)</span>
+              <Rating
+                        style={{ maxWidth: 90 }}
+                        readOnly
+                        itemStyles={myStyles}
+                        value={coffee.rating}
+                      />
+              <span className="text-sm text-gray-400">(46 customer review)</span>
             </div>
 
             {/* Price */}
-            <div className="text-2xl font-bold text-white">${coffee.price}</div>
+            <div className='flex items-center'>
+                      <TbCurrencyTaka className='text-2xl'/>
+                      <p className="font- text-2xl ">
+                         
+                        {coffee.price}
+                      </p>
+                    </div>
 
             {/* Add to Cart Section */}
             <div className="flex items-center gap-4">
@@ -121,8 +140,8 @@ const CoffeeDetails = () => {
             {/*  Categories */}
             <div className="space-y-2 text-sm border-t border-gray-700 pt-6">
               <p className="text-gray-400">
-                <span className="font-semibold">Categories:</span>{" "}
-                {coffee.region}, {coffee.roast_level}
+                <span className="font-semibold">Category :</span>{" "}
+                {coffee.category}
               </p>
             </div>
           </div>

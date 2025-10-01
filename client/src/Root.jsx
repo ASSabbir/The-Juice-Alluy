@@ -12,19 +12,19 @@ const Root = () => {
             <Outlet></Outlet>
 
 
-            {/* <ReactLenis
+            <ReactLenis
                 root
                 options={{
                     duration: 1.2,        
-                    easing: (t) => 1 - Math.pow(1 - t, 3), 
+                    // easing: (t) => 1 - Math.pow(1 - t, 3), 
                     gestureDirection: 'both', 
                     smoothWheel: true,    
                     smoothTouch: true,    
                     touchMultiplier: 1.5,  
-                    wheelMultiplier: 1.5,    
+                    wheelMultiplier: 2,    
                     infinite: false,       
                 }}
-            /> */}
+            />
         </div>
     );
 };

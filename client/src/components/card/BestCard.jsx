@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { Rating, ThinStar } from '@smastrom/react-rating'
 import { TbCurrencyTaka } from "react-icons/tb";
 import '@smastrom/react-rating/style.css'
-const Card = ({ coffee }) => {
+const BestCard = ({ coffee }) => {
 
   console.log(coffee)
   const myStyles = {
@@ -17,7 +17,7 @@ const Card = ({ coffee }) => {
       className="  max-w-96 w-full overflow-hidden"
     >
       <NavLink to={`/coffee/${coffee._id}`}>
-        <figure className='w- h-96 flex justify-center items-center bg-backgrondDark overflow-hidden'>
+        <figure className='w- h-96 flex justify-center items-center bg-backgrondLight overflow-hidden'>
           <img
             src={coffee.image}
             alt={coffee.name}
@@ -51,4 +51,4 @@ const Card = ({ coffee }) => {
   );
 };
 
-export default Card;
+export default BestCard;
