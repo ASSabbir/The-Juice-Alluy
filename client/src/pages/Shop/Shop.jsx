@@ -47,7 +47,7 @@ const Shop = () => {
 
           </select>
         </div>
-        <div className="grid bg-[#1a1a1a]  grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid bg-[#1a1a1a] space-y-20  grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {coffees.map((coffee) => <Card key={coffee._id} coffee={coffee}></Card>)}
         </div>
       </div>
