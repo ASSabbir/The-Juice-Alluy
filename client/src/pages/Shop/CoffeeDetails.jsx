@@ -48,7 +48,7 @@ const CoffeeDetails = () => {
       Swal.fire({
         icon: "success",
         title: "Added to Cart!",
-        text: `${coffee.name} has been added to your cart.`,
+        text: `${coffee.title} has been added to your cart.`,
         background: "#1a1a1a",
         color: "#d2a679",
         confirmButtonColor: "#d2a679",

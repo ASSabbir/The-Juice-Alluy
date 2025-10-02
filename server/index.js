@@ -32,6 +32,19 @@ async function run() {
       res.send(coffee);
     });
 
+
+    // Products add and get api
+
+    app.post('/coffee', async (req, res) => {
+      const data = req.body
+      console.log(data)
+      const result = await coffeesCollections.insertOne(data)
+      res.send(result)
+    })
+
+
+
+
     //Get single coffee by ID
     app.get('/coffee/:id', async (req, res) => {
       const id = req.params.id;
@@ -100,20 +113,11 @@ async function run() {
       }
     });
 
-
     app.get("/best_products", async (req, res) => {
       const result = await coffeesCollections.find({}).limit(4).toArray()
       console.log(result)
       res.send(result);
     })
-
-
-
-
-
-
-
-
     console.log("Connected to MongoDB successfully!");
 
 
