@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { Rating, ThinStar } from '@smastrom/react-rating'
+import { Rating, ThinStar } from "@smastrom/react-rating";
 import { TbCurrencyTaka } from "react-icons/tb";
 
 const CoffeeDetails = () => {
@@ -11,12 +12,12 @@ const CoffeeDetails = () => {
   const [activeTab, setActiveTab] = useState("description");
   const [quantity, setQuantity] = useState(1);
   const myStyles = {
-      itemShapes: ThinStar,
-      activeFillColor: '#dbad6a',
-      inactiveFillColor: '#fbf1a9'
-    }
+    itemShapes: ThinStar,
+    activeFillColor: "#dbad6a",
+    inactiveFillColor: "#fbf1a9",
+  };
 
-
+  const navigate = useNavigate();
   useEffect(() => {
     const getCoffee = async () => {
       try {
@@ -64,7 +65,7 @@ const CoffeeDetails = () => {
 
   if (!coffee)
     return <p className="text-center mt-10 text-white">Loading...</p>;
-console.log(coffee)
+  console.log(coffee);
   return (
     <div className="bg-[#0f0f0f] min-h-screen">
       <div className="relative bg-backgrondDark h-96 flex flex-col justify-center items-center">
@@ -97,22 +98,21 @@ console.log(coffee)
             {/* Reviews */}
             <div className="flex items-center gap-2">
               <Rating
-                        style={{ maxWidth: 90 }}
-                        readOnly
-                        itemStyles={myStyles}
-                        value={coffee.rating}
-                      />
-              <span className="text-sm text-gray-400">(46 customer review)</span>
+                style={{ maxWidth: 90 }}
+                readOnly
+                itemStyles={myStyles}
+                value={coffee.rating}
+              />
+              <span className="text-sm text-gray-400">
+                (46 customer review)
+              </span>
             </div>
 
             {/* Price */}
-            <div className='flex items-center'>
-                      <TbCurrencyTaka className='text-2xl'/>
-                      <p className="font- text-2xl ">
-                         
-                        {coffee.price}
-                      </p>
-                    </div>
+            <div className="flex items-center">
+              <TbCurrencyTaka className="text-2xl" />
+              <p className="font- text-2xl ">{coffee.price}</p>
+            </div>
 
             {/* Add to Cart Section */}
             <div className="flex items-center gap-4">
@@ -131,11 +131,23 @@ console.log(coffee)
               />
             </div>
             <button
+              onClick={() =>
+                navigate(`/order/${coffee._id}`, {
+                  state: { product: coffee },
+                })
+              }
+              className="flex-1 bg-gradient-to-r w-full from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
+            >
+              Order Now
+            </button>
+
+            
+            {/* <button
                 onClick={handleAddToCart}
                 className="flex-1 bg-gradient-to-r w-full from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
               >
                 Order Now
-              </button>
+              </button> */}
 
             {/*  Categories */}
             <div className="space-y-2 text-sm border-t border-gray-700 pt-6">
@@ -216,13 +228,19 @@ console.log(coffee)
                   <p className="font-bold text-heading-secondary">Weight:</p>
                   <p>{coffee.weight}</p>
 
-                  <p className="font-bold text-heading-secondary">Roast Level:</p>
+                  <p className="font-bold text-heading-secondary">
+                    Roast Level:
+                  </p>
                   <p>{coffee.roast_level}</p>
 
-                  <p className="font-bold text-heading-secondary">Flavor Profile:</p>
+                  <p className="font-bold text-heading-secondary">
+                    Flavor Profile:
+                  </p>
                   <p>{coffee.flavor_profile?.join(", ")}</p>
 
-                  <p className="font-bold text-heading-secondary">Ingredients:</p>
+                  <p className="font-bold text-heading-secondary">
+                    Ingredients:
+                  </p>
                   <p>{coffee.ingredients?.join(", ")}</p>
                 </div>
               </div>

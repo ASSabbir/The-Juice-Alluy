@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Rating, ThinStar } from '@smastrom/react-rating'
 import { TbCurrencyTaka } from "react-icons/tb";
@@ -20,7 +19,6 @@ const Card = ({ coffee }) => {
         <figure className='w- h-96 flex justify-center items-center bg-backgrondDark overflow-hidden'>
           <img
             src={coffee.image}
-            className=" w-full  h-full object-center object-cover  hover:scale-[1.09] duration-500 transition"
             alt={coffee.title}
             className="w-75 object-center object-cover  hover:scale-[1.09] duration-500 transition"
           />
@@ -39,7 +37,7 @@ const Card = ({ coffee }) => {
         <div className='flex items-center'>
           <TbCurrencyTaka className='text-xl'/>
           <p className="font- text-lg ">
-            
+
             {coffee.price}
           </p>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+
 import { NavLink } from 'react-router-dom';
 import { Rating, ThinStar } from '@smastrom/react-rating'
 import { TbCurrencyTaka } from "react-icons/tb";
@@ -38,13 +38,13 @@ const BestCard = ({ coffee }) => {
         <div className='flex items-center'>
           <TbCurrencyTaka className='text-xl'/>
           <p className="font- text-lg ">
-            
+
             {coffee.price}
           </p>
         </div>
 
         {/* <div className="card-actions justify-end mt-4">
-          
+
         </div> */}
       </div>
     </div>
