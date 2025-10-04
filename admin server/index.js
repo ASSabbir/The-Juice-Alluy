@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const app = express();
-const port = 5000;
+const port = 3000;
 
 // Middleware
 app.use(cors());
@@ -22,14 +22,40 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
-
 let db;
+let coffeesCollections;
+let ordersCollections;
 async function run() {
   try {
     await client.connect();
     db = client.db("JuiceAlluy");
-    const coffeesCollections = db.collection("coffees");
+    coffeesCollections = db.collection("coffees");
+    ordersCollections = db.collection("orders");
+    const admins = db.collection("admins");
     console.log("Connected to MongoDB successfully!");
+
+
+
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || "superadmin@juicealluy.com";
+    const superAdminPass = process.env.SUPER_ADMIN_PASS || "superadmin123";
+
+    let existingAdmin = await admins.findOne({ email: superAdminEmail });
+
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash(superAdminPass, 10);
+      await admins.insertOne({
+        email: superAdminEmail,
+        password: hashedPassword,
+        phone: process.env.SUPER_ADMIN_PHONE || "+8801000000000",
+        role: "superadmin",
+        isVerified: true,
+        createdAt: new Date()
+      });
+      console.log("✅ Super Admin created:", superAdminEmail);
+    } else {
+      console.log("ℹ️ Super Admin already exists:", superAdminEmail);
+    }
+
   } catch (err) {
     console.error("Mongo connection error:", err);
   }
@@ -49,8 +75,8 @@ app.get('/', (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: "billah5193@diu.edu.bd",
+    pass: "wthe bgar jpsr docm"
   }
 });
 
@@ -242,6 +268,61 @@ app.post('/api/admin/change-password', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// delete coffee
+app.delete('/coffees/:id', async (req, res) => {
+  try {
+
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await coffeesCollections.deleteOne(query);
+    res.send(result);
+
+
+    console.log("✅ Delete route ready!");
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.get('/coffees', async (req, res) => {
+  try {
+    const coffees = await coffeesCollections.find().toArray();
+    res.send(coffees);
+  } catch (error) {
+    console.error("Error fetching coffees:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+//create orders
+app.post('/order', async (req, res) => {
+  try {
+    const order = req.body;
+    const result = await ordersCollections.insertOne(order);
+    res.send(result);
+  } catch (error) {
+    console.error("Error fetching coffees:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+// get orders
+app.get('/orders', async (req, res) => {
+  try {
+    const orders = await ordersCollections.find().toArray();
+    res.send(orders);
+
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+
+  }
+})
+
+
+
+
+
+
 
 // ==========================
 // Start Server
