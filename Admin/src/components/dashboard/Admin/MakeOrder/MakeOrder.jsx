@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Search, Plus, Trash2, ShoppingCart } from "lucide-react";
 import axios from "axios";
+import { TbCurrencyTaka } from "react-icons/tb";
+import Swal from "sweetalert2";
 
 const MakeOrder = () => {
   const [coffees, setCoffees] = useState([]);
   const [filteredCoffees, setFilteredCoffees] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [customerInfo, setCustomerInfo] = useState({
+ const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phone: "",
-    address: ""
+    address: "",
   });
 
   useEffect(() => {
@@ -41,7 +43,10 @@ const MakeOrder = () => {
   const addToOrder = (coffee) => {
     const exists = selectedProducts.find((p) => p._id === coffee._id);
     if (exists) {
-      alert("Product already added to order!");
+      Swal.fire({
+        icon: "warning",
+        title: "Product already added!",
+      });
       return;
     }
     setSelectedProducts([...selectedProducts, { ...coffee, quantity: 1 }]);
@@ -73,12 +78,20 @@ const MakeOrder = () => {
   // Submit order
   const handleSubmitOrder = async () => {
     if (selectedProducts.length === 0) {
-      alert("Please add at least one product!");
+      Swal.fire({
+        icon: "error",
+        title: "No products selected!",
+        text: "Please add at least one product.",
+      });
       return;
     }
 
     if (!customerInfo.name || !customerInfo.phone) {
-      alert("Please enter customer name and phone!");
+      Swal.fire({
+        icon: "error",
+        title: "Missing Information",
+        text: "Please enter customer name and phone.",
+      });
       return;
     }
 
@@ -86,45 +99,56 @@ const MakeOrder = () => {
       customer: customerInfo,
       products: selectedProducts.map((p) => ({
         productId: p._id,
-        name: p.name,
+        name: p.title,
         quantity: p.quantity,
-        price: p.price
+        price: p.price,
       })),
       total: calculateTotal(),
       orderDate: new Date(),
-      status: "pending"
+      status: "pending",
+      orderSource: "manual",
+
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(orderData)
-      });
+      const res = await axios.post("http://localhost:3000/order", orderData);
 
-      if (res.ok) {
-        alert("Order created successfully!");
+      if (res.data.acknowledged || res.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Order Created!",
+          text: "Your order has been saved successfully.",
+        });
+
         // Reset form
         setSelectedProducts([]);
         setCustomerInfo({ name: "", phone: "", address: "" });
         setSearchQuery("");
       } else {
-        alert("Failed to create order!");
+        Swal.fire({
+          icon: "error",
+          title: "Failed!",
+          text: "Could not create order.",
+        });
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      alert("Failed to create order!");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to create order.",
+      });
     }
   };
+
 
   return (
     <div className="min-h-screen bg-backgrondLight text-white">
       {/* Header */}
       <div className="bg-backgrondDark  flex w-4/5  p-4 mt-3 mx-auto border-b border-gray-800 text-center">
-        <h1 className="text-3xl font-bold  flex mx-auto ">Create Manual Order</h1>
-
+        <h1 className="text-3xl font-bold  flex mx-auto ">
+          Create Manual Order
+        </h1>
       </div>
 
       <div className="px-8 py-6">
@@ -132,9 +156,14 @@ const MakeOrder = () => {
           {/* Left: Product Search */}
           <div className="lg:col-span-2 bg-backgrondDark rounded-lg p-6">
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Search Products</label>
+              <label className="block text-sm font-medium mb-2">
+                Search Products
+              </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
                 <input
                   type="text"
                   placeholder="Search coffee by name..."
@@ -160,8 +189,14 @@ const MakeOrder = () => {
                         className="w-16 h-16 object-cover rounded"
                       />
                       <div>
-                        <h3 className="font-semibold text-lg">{coffee.title}</h3>
-                        <p className="text-amber-500 font-bold">${coffee.price}</p>
+                        <h3 className="font-semibold text-lg">
+                          {coffee.title}
+                        </h3>
+
+                        <p className="text-amber-500 font-bold flex items-center">
+                          <TbCurrencyTaka className="text-xl" />
+                          {coffee.price}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -174,7 +209,9 @@ const MakeOrder = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-400 py-8">No products found</p>
+                <p className="text-center text-gray-400 py-8">
+                  No products found
+                </p>
               )}
             </div>
           </div>
@@ -189,30 +226,45 @@ const MakeOrder = () => {
             {/* Customer Info */}
             <div className="mb-6 space-y-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Customer Name *</label>
+                <label className="block text-sm font-medium mb-1">
+                  Customer Name *
+                </label>
                 <input
                   type="text"
                   value={customerInfo.name}
-                  onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
+                  onChange={(e) =>
+                    setCustomerInfo({ ...customerInfo, name: e.target.value })
+                  }
                   className="w-full bg-backgrondLight placeholder-black text-black  border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
                   placeholder="Enter name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Phone *</label>
+                <label className="block text-sm font-medium mb-1">
+                  Phone *
+                </label>
                 <input
                   type="tel"
                   value={customerInfo.phone}
-                  onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                  onChange={(e) =>
+                    setCustomerInfo({ ...customerInfo, phone: e.target.value })
+                  }
                   className="w-full bg-backgrondLight placeholder-black text-black  border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
                   placeholder="Enter phone"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Address</label>
+                <label className="block text-sm font-medium mb-1">
+                  Address
+                </label>
                 <textarea
                   value={customerInfo.address}
-                  onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
+                  onChange={(e) =>
+                    setCustomerInfo({
+                      ...customerInfo,
+                      address: e.target.value,
+                    })
+                  }
                   className="w-full bg-backgrondLight placeholder-black text-black  border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
                   placeholder="Enter address"
                   rows="2"
@@ -222,7 +274,9 @@ const MakeOrder = () => {
 
             {/* Selected Products */}
             <div className="border-t border-gray-800 pt-4 mb-4">
-              <h3 className="font-semibold mb-3">Products ({selectedProducts.length})</h3>
+              <h3 className="font-semibold mb-3">
+                Products ({selectedProducts.length})
+              </h3>
               <div className="space-y-3 max-h-[250px] overflow-y-auto">
                 {selectedProducts.length > 0 ? (
                   selectedProducts.map((product) => (
@@ -246,18 +300,23 @@ const MakeOrder = () => {
                             type="number"
                             min="1"
                             value={product.quantity}
-                            onChange={(e) => updateQuantity(product._id, e.target.value)}
+                            onChange={(e) =>
+                              updateQuantity(product._id, e.target.value)
+                            }
                             className="w-16 bg-backgrondLight placeholder-black text-black  border border-gray-700 rounded px-2 py-1 text-sm focus:outline-none focus:border-amber-600"
                           />
                         </div>
-                        <span className="text-amber-500 font-bold">
-                          ${(product.price * product.quantity).toFixed(2)}
+                        <span className="text-amber-500 font-bold flex items-center">
+                          <TbCurrencyTaka className="text-xl" />
+                          {(product.price * product.quantity).toFixed(2)}
                         </span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-gray-400 text-sm py-4">No products added</p>
+                  <p className="text-center text-gray-400 text-sm py-4">
+                    No products added
+                  </p>
                 )}
               </div>
             </div>
@@ -266,7 +325,10 @@ const MakeOrder = () => {
             <div className="border-t border-gray-800 pt-4 mb-4">
               <div className="flex justify-between items-center text-xl font-bold">
                 <span>Total:</span>
-                <span className="text-white">${calculateTotal().toFixed(2)}</span>
+                <span className="text-white flex items-center">
+                  <TbCurrencyTaka className="text-xl" />
+                  {calculateTotal().toFixed(2)}
+                </span>
               </div>
             </div>
 

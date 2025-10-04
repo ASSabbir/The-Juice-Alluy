@@ -193,7 +193,7 @@ const AddProduct = () => {
               <input
                 name="price"
                 type="number"
-                placeholder="Price in USD"
+                placeholder="Price in Taka"
                 className="w-full rounded-md p-2 border border-amber-900 placeholder-amber-950 bg-white text-black"
               />
             </div>

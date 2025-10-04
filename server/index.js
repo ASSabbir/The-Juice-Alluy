@@ -23,7 +23,7 @@ async function run() {
   try {
     const database = client.db("JuiceAlluy");
     const coffeesCollections = database.collection("coffees");
-    const usersCollections = database.collection("users");
+                                                              
     const cartCollections = database.collection("carts");
 
     //Get all coffees
@@ -58,6 +58,7 @@ async function run() {
       const result = await usersCollections.find().toArray();
       res.send(result);
     });
+
 
     //Add new user (with duplicate check)
     app.post('/users', async (req, res) => {
