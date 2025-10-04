@@ -49,7 +49,7 @@ const AddToCart = () => {
 
       Swal.fire("Deleted!", "Item has been removed.", "success");
     } catch (error) {
-      Swal.fire("Error!", "Something went wrong.", "error");
+      Swal.fire("Error!", "Something went wrong.", error);
     }
   };
 
