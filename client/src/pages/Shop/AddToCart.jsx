@@ -90,10 +90,10 @@ const AddToCart = () => {
   };
 
   return (
-    <div className="text-white min-h-screen">
+    <div className="text-white ">
       {/* Banner */}
       <div className="relative bg-backgrondDark h-80 flex flex-col justify-center items-center">
-        <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/bottom-fire-img1.png')] bg-bottom bg-no-repeat bg-cover filter"></div>
+        <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/36.jpg')] bg-center bg-no-repeat bg-cover filter"></div>
         <h2 className="relative text-5xl text-center font-moglan text-white">
           Your Cart
         </h2>
@@ -108,29 +108,41 @@ const AddToCart = () => {
       </div>
 
       {/* Cart Section */}
-      <div className="mt-[5vw] px-[9vw] grid grid-cols-1 lg:grid-cols-3 gap-10 pb-24">
+      <div className="mt-[7vw] bg-bac px-[9vw] grid grid-cols-1 lg:grid-cols-3 gap-10 pb-24">
         {/* LEFT - Cart Items */}
-        <div className="lg:col-span-2 bg-[#1a1a1a] rounded-xl p-6 shadow-lg">
+        <div className="lg:col-span-2 bg-backgrondDark rounded-xl p-6  ">
           <h2 className="text-2xl font-bold text-[#d2a679] mb-6">Cart Items</h2>
           {cart.length === 0 ? (
             <p className="text-gray-400 italic">Your cart is empty</p>
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-[#d2a679] border-b border-gray-700">
-                  <th className="p-3">Item</th>
-                  <th className="p-3">Price</th>
-                  <th className="p-3">Quantity</th>
-                  <th className="p-3">Total</th>
-                  <th className="p-3">Action</th>
+                <tr className="border-b border-gray-700 border-2 bg-zinc-900">
+
+                  {/* Product Column: Kept Left-Aligned (as the content is left-aligned) */}
+                  <th className="p-3 text-left">Product</th>
+
+                  {/* Price Column: MUST be centered to match the <td> content */}
+                  <th className="p-3 text-center ">Price</th>
+
+                  {/* Quantity Column: MUST be centered to match the <td> content */}
+                  <th className="p-3 text-center ">Quantity</th>
+
+                  {/* Subtotal Column: MUST be centered to match the <td> content */}
+                  <th className="p-3 text-center">Subtotal</th>
+
+                  {/* Action Column (Delete): MUST be centered to match the delete button's container */}
+                  <th className="p-3 text-center">Actions</th>
+
                 </tr>
               </thead>
               <tbody>
                 {cart.map((item) => (
                   <tr
                     key={item._id}
-                    className="border-b border-gray-700 hover:bg-[#2a2a2a]"
+                    className="border-b border-gray-700  hover:bg-[#2a2a2a]"
                   >
+                    {/* Product Name (Keep as is, it has flex for image/text alignment) */}
                     <td className="p-3 flex items-center gap-3">
                       <img
                         src={item.image}
@@ -139,26 +151,43 @@ const AddToCart = () => {
                       />
                       {item.name}
                     </td>
-                    <td className="p-3">${item.price.toFixed(2)}</td>
-                    <td className="p-3 flex items-center gap-3">
-                      <button
-                        onClick={() => updateQuantity(item._id, -1)}
-                        className="bg-[#d2a679] text-black px-2 py-1 rounded-full hover:scale-110"
-                      >
-                        <FaMinus />
-                      </button>
-                      {item.quantity || 1}
-                      <button
-                        onClick={() => updateQuantity(item._id, 1)}
-                        className="bg-[#d2a679] text-black px-2 py-1 rounded-full hover:scale-110"
-                      >
-                        <FaPlus />
-                      </button>
+
+                    {/* Price Cell: Add 'text-center' to center the text */}
+                    <td className="p-3  text-center">
+                      ${parseFloat(item.price).toFixed(2)}
                     </td>
-                    <td className="p-3">
-                      ${(item.price * (item.quantity || 1)).toFixed(2)}
+
+                    {/* Quantity Cell: Remove 'flex' and 'items-center' from the <td> */}
+                    {/* Instead, add 'justify-center' to center the content horizontally, and 'text-center' for the quantity number. */}
+                    <td className="p-3 text-center ">
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={() => updateQuantity(item._id, -1)}
+                          className="bg-[#d2a679] text-black px-2 py-1 rounded-full hover:scale-110"
+                        >
+                          <FaMinus />
+                        </button>
+                        {item.quantity || 1}
+                        <button
+                          onClick={() => updateQuantity(item._id, 1)}
+                          className="bg-[#d2a679] text-black px-2 py-1 rounded-full hover:scale-110"
+                        >
+                          <FaPlus />
+                        </button>
+                      </div>
                     </td>
-                    <td className="p-3">
+
+                    {/* Subtotal Cell: Add 'text-center' to center the subtotal */}
+                    <td className="p-3 text-center">
+                      {
+                        !isNaN(parseFloat(item.price))
+                          ? `$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}`
+                          : 'N/A'
+                      }
+                    </td>
+
+                    {/* Delete Cell: Use flex on the button container to center the button */}
+                    <td className="p-3 flex justify-center">
                       <button
                         onClick={() => handleDelete(item._id)}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg flex items-center gap-2"

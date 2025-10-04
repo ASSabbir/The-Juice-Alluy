@@ -113,7 +113,14 @@ async function run() {
       }
     });
 
+    app.get("/best_products", async (req, res) => {
+      const result = await coffeesCollections.find({}).limit(4).toArray()
+      console.log(result)
+      res.send(result);
+    })
     console.log("Connected to MongoDB successfully!");
+
+
   } finally {
     // await client.close(); // keep connection open for server
   }

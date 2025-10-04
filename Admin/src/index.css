@@ -5,6 +5,10 @@
   font-family: moglan;
   src: url(/Moglan_DEMO.ttf);
 }
+a, button, .cursor-pointer, [role="button"] {
+  cursor: pointer;
+}
+
 
 @plugin "daisyui";
 
