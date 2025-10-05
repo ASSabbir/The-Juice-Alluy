@@ -61,65 +61,68 @@ const Order = () => {
     }
   };
 
-  // Handle Order Submission
-  const handleOrderNow = async () => {
-    if (!paymentMethod) {
-      Swal.fire("Error!", "Please select a payment method.", "error");
-      return;
-    }
+// Handle Order Submission
+const handleOrderNow = async () => {
+  if (!paymentMethod) {
+    Swal.fire("Error!", "Please select a payment method.", "error");
+    return;
+  }
 
-    try {
-      // Prepare order data
-      const orderData = {
-        product: {
-          id: product._id,
-          name: product.name,
-          image: product.image,
-          price: product.price,
-        },
-        quantity: quantity,
-        subtotal: subtotal,
-        vat: vat,
-        discount: discount,
-        grandTotal: grandTotal,
-        paymentMethod: paymentMethod,
-        orderSource: "online",
-        status: "pending",
-        couponUsed: discount > 0 ? coupon : null,
-        orderDate: new Date(),
-        customerName: user.displayName || "Guest",
-        customerEmail: user.email,
-        customerUID: user.uid,
-        customerPhoto: user.photoURL || null,
-      };
+  try {
+    const orderItems = [
+      {
+        id: product._id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+        quantity,
+        subtotal,
+      },
+    ];
 
-      // Save to database
-      const response = await axios.post(
-        "http://localhost:5000/orders",
-        orderData
-      );
+    const orderData = {
+      items: orderItems,
+      subtotal,
+      vat,
+      discount,
+      grandTotal,
+      paymentMethod,
+      orderSource: "online",
+      status: "pending",
+      couponUsed: discount > 0 ? coupon : null,
+      orderDate: new Date().toISOString(),
+      customerName: user?.displayName || "Guest",
+      customerEmail: user?.email || "guest@example.com",
+      customerUID: user?.uid || null,
+      customerPhoto: user?.photoURL || null,
+    };
 
-      if (response.status === 200 || response.status === 201) {
-        Swal.fire({
-          title: "Order Placed Successfully!",
-          text: `Thank you for your order! Payment via ${paymentMethod.toUpperCase()}`,
-          icon: "success",
-          confirmButtonText: "Go to Home",
-          confirmButtonColor: "#d2a679",
-        }).then(() => {
-          window.location.href = "/";
-        });
-      }
-    } catch (error) {
-      console.error("Error placing order:", error);
+    const response = await axios.post("http://localhost:5000/orders", orderData, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.status === 201) {
       Swal.fire({
-        title: "Order Failed",
-        text: "Something went wrong. Please try again.",
-        icon: "error",
+        title: "Order Placed Successfully!",
+        text: `Thank you for your order! Payment via ${paymentMethod.toUpperCase()}`,
+        icon: "success",
+        confirmButtonText: "Go to Home",
         confirmButtonColor: "#d2a679",
+      }).then(() => {
+        window.location.href = "/";
       });
     }
-  };
+  } catch (error) {
+    console.error("Error placing order:", error.response?.data || error.message);
+    Swal.fire({
+      title: "Order Failed",
+      text: error.response?.data?.error || "Something went wrong. Please try again.",
+      icon: "error",
+      confirmButtonColor: "#d2a679",
+    });
+  }
+};
+
 
   if (!product) {
     return (
@@ -250,7 +253,7 @@ const Order = () => {
 
         {/* RIGHT - Order Summary */}
         <div className="bg-[#1a1a1a] rounded-xl shadow-2xl p-6 border-4 border-[#d2a679] relative h-fit">
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#d2a679] text-black px-6 py-2 rounded-full font-bold shadow-lg">
+          <div className="absolute w-3/4 -top-4 left-1/2 -translate-x-1/2 bg-[#d2a679] text-black px-6 py-2 rounded-full font-bold shadow-lg">
             Coffee Shop Voucher
           </div>
           <h3 className="text-2xl font-bold text-center text-[#d2a679] mt-6 mb-6">
