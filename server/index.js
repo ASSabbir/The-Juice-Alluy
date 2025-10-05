@@ -23,10 +23,10 @@ async function run() {
   try {
     const database = client.db("JuiceAlluy");
     const coffeesCollections = database.collection("coffees");
-                                                              
+
     const cartCollections = database.collection("carts");
     const orderCollections = database.collection("orders");
-
+    const ordersCollections = database.collection("orders");
     //Get all coffees
     app.get('/coffee', async (req, res) => {
       const coffee = await coffeesCollections.find().toArray();
@@ -114,7 +114,7 @@ app.put('/users/:email', async (req, res) => {
     });
 
     // Get cart items by user email
-    app.get("/cart/:email", async (req, res) => { 
+    app.get("/cart/:email", async (req, res) => {
   try {
     const email = req.params.email;
     const query = { userEmail: email };
@@ -161,7 +161,7 @@ app.post("/orders", async (req, res) => {
     const order = req.body;
 
     if (!order || !order.items || order.items.length === 0) {
-      return res.status(400).send({ error: "Order data is invalid" }); 
+      return res.status(400).send({ error: "Order data is invalid" });
     }
 
     const result = await orderCollections.insertOne(order);
@@ -182,6 +182,23 @@ app.post("/orders", async (req, res) => {
       console.log(result)
       res.send(result);
     })
+
+
+    app.post('/orders', async (req, res) => {
+      try {
+        const orderData = req.body;
+        const result = await ordersCollections.insertOne(orderData);
+        res.status(201).json({
+          message: "Order placed successfully",
+          orderId: result.insertedId
+        });
+      } catch (error) {
+        console.error("Error placing order:", error);
+        res.status(500).json({ error: "Failed to place order" });
+      }
+    });
+
+
     console.log("Connected to MongoDB successfully!");
 
 
