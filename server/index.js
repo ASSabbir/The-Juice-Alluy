@@ -25,6 +25,7 @@ async function run() {
     const coffeesCollections = database.collection("coffees");
 
     const cartCollections = database.collection("carts");
+    const orderCollections = database.collection("orders");
     const ordersCollections = database.collection("orders");
     //Get all coffees
     app.get('/coffee', async (req, res) => {
@@ -151,6 +152,31 @@ app.delete("/cart/clear/:email", async (req, res) => {
   }
 });
 
+
+//Add new order
+app.post("/orders", async (req, res) => {
+  try {
+    console.log("Incoming Order:", req.body);
+
+    const order = req.body;
+
+    if (!order || !order.items || order.items.length === 0) {
+      return res.status(400).send({ error: "Order data is invalid" });
+    }
+
+    const result = await orderCollections.insertOne(order);
+    res.status(201).send({
+      success: true,
+      message: "Order placed successfully",
+      orderId: result.insertedId,
+    });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).send({ error: "Failed to create order" });
+  }
+});
+
+
     app.get("/best_products", async (req, res) => {
       const result = await coffeesCollections.find({}).limit(4).toArray()
       console.log(result)
@@ -174,6 +200,8 @@ app.delete("/cart/clear/:email", async (req, res) => {
 
 
     console.log("Connected to MongoDB successfully!");
+
+
 
 
   } finally {

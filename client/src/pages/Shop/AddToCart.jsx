@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
+import {
+  FaPlus,
+  FaMinus,
+  FaTrash,
+  FaCreditCard,
+  FaMoneyBillWave,
+  FaMobileAlt,
+} from "react-icons/fa";
 import { AuthContext } from "../../providers/AuthContext";
 
 const AddToCart = () => {
@@ -9,23 +16,24 @@ const AddToCart = () => {
   const [cart, setCart] = useState([]);
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
-  //Fetch Cart for Specific User
+  // Fetch Cart for Specific User
   const fetchCart = async () => {
-  try {
-    if (!user?.email) return;
-    const res = await axios.get(`http://localhost:5000/cart/${user.email}`);
-    setCart(res.data);
-  } catch (error) {
-    console.error("Error fetching user cart:", error);
-  }
-};
+    try {
+      if (!user?.email) return;
+      const res = await axios.get(`http://localhost:5000/cart/${user.email}`);
+      setCart(res.data);
+    } catch (error) {
+      console.error("Error fetching user cart:", error);
+    }
+  };
 
   useEffect(() => {
     fetchCart();
   }, [user]);
 
-  //Update Quantity (in UI only)
+  // Update Quantity (in UI only)
   const updateQuantity = (id, change) => {
     const updatedCart = cart.map((item) =>
       item._id === id
@@ -35,18 +43,18 @@ const AddToCart = () => {
     setCart(updatedCart);
   };
 
-  //Delete Item
+  // Delete Item
   const handleDelete = async (id) => {
-  try {
-    await axios.delete(`http://localhost:5000/cart/${id}`);
-    setCart(cart.filter((item) => item._id !== id));
-    Swal.fire("Deleted!", "Item has been removed.", "success");
-  } catch (error) {
-    Swal.fire("Error!", "Something went wrong.", "error");
-  }
-};
+    try {
+      await axios.delete(`http://localhost:5000/cart/${id}`);
+      setCart(cart.filter((item) => item._id !== id));
+      Swal.fire("Deleted!", "Item has been removed.", "success");
+    } catch (error) {
+      Swal.fire("Error!", "Something went wrong.", "error");
+    }
+  };
 
-  //Subtotal, VAT, Discount
+  // Subtotal, VAT, Discount
   const subtotal = cart.reduce(
     (acc, item) => acc + item.price * (item.quantity || 1),
     0
@@ -54,7 +62,7 @@ const AddToCart = () => {
   const vat = subtotal * 0.02;
   const grandTotal = subtotal + vat - discount;
 
-  //Apply Coupon
+  // Apply Coupon
   const applyCoupon = () => {
     if (coupon.toLowerCase() === "firstorder") {
       setDiscount(subtotal * 0.05);
@@ -65,26 +73,82 @@ const AddToCart = () => {
     }
   };
 
+  // Handle Payment & Order Placement
   const handlePayNow = async () => {
-  try {
-    if (!user?.email) return;
+    try {
+      if (!user?.email) {
+        Swal.fire("Error!", "Please log in to continue.", "error");
+        return;
+      }
 
-    await axios.delete(`http://localhost:5000/cart/clear/${user.email}`);
-    setCart([]);
+      if (!paymentMethod) {
+        Swal.fire("Select Payment Method", "Please choose a payment method.", "warning");
+        return;
+      }
 
-    Swal.fire({
-      title: "Payment Successful",
-      text: "Thank you for your order!",
-      icon: "success",
-      confirmButtonText: "Go to Home",
-      confirmButtonColor: "#d2a679",
-    }).then(() => {
-      window.location.href = "/";
-    });
-  } catch (error) {
-    Swal.fire("Error!", "Payment failed. Try again.", "error");
-  }
-};
+      if (cart.length === 0) {
+        Swal.fire("Empty Cart", "Your cart is empty!", "info");
+        return;
+      }
+
+      // Prepare combined order data
+      const orderItems = cart.map((item) => ({
+        id: item._id,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        quantity: item.quantity || 1,
+        subtotal: item.price * (item.quantity || 1),
+      }));
+
+      const orderData = {
+        items: orderItems,
+        subtotal,
+        vat,
+        discount,
+        grandTotal,
+        paymentMethod,
+        orderSource: "online",
+        status: "pending",
+        couponUsed: discount > 0 ? coupon : null,
+        orderDate: new Date(),
+        customerName: user.displayName || "Guest",
+        customerEmail: user.email,
+        customerUID: user.uid,
+        customerPhoto: user.photoURL || null,
+      };
+
+      // Save to database
+      const response = await axios.post(
+        "http://localhost:5000/orders",
+        orderData
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        // Clear cart from DB
+        await axios.delete(`http://localhost:5000/cart/clear/${user.email}`);
+        setCart([]);
+
+        Swal.fire({
+          title: "Order Placed Successfully!",
+          text: `Thank you for your order! Payment via ${paymentMethod.toUpperCase()}`,
+          icon: "success",
+          confirmButtonText: "Go to Home",
+          confirmButtonColor: "#d2a679",
+        }).then(() => {
+          window.location.href = "/";
+        });
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      Swal.fire({
+        title: "Order Failed",
+        text: "Something went wrong. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#d2a679",
+      });
+    }
+  };
 
   return (
     <div className="text-white">
@@ -160,9 +224,7 @@ const AddToCart = () => {
                     </td>
 
                     <td className="p-3 text-center">
-                      ${(
-                        parseFloat(item.price) * (item.quantity || 1)
-                      ).toFixed(2)}
+                      ${(item.price * (item.quantity || 1)).toFixed(2)}
                     </td>
 
                     <td className="p-3 text-center">
@@ -221,6 +283,53 @@ const AddToCart = () => {
             >
               Apply
             </button>
+          </div>
+
+          {/* Payment Method Selection */}
+          <div className="border-t border-gray-700 pt-6 mt-6">
+            <h3 className="text-xl font-bold text-[#d2a679] mb-4">
+              Select Payment Method
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Card */}
+              <button
+                onClick={() => setPaymentMethod("card")}
+                className={`p-4 rounded-lg border-2 transition ${
+                  paymentMethod === "card"
+                    ? "border-[#d2a679] bg-[#2a2a2a]"
+                    : "border-gray-700 hover:border-gray-600"
+                }`}
+              >
+                <FaCreditCard className="text-4xl mx-auto mb-2 text-[#d2a679]" />
+                <p className="text-center font-semibold">Card</p>
+              </button>
+
+              {/* Cash */}
+              <button
+                onClick={() => setPaymentMethod("cash")}
+                className={`p-4 rounded-lg border-2 transition ${
+                  paymentMethod === "cash"
+                    ? "border-[#d2a679] bg-[#2a2a2a]"
+                    : "border-gray-700 hover:border-gray-600"
+                }`}
+              >
+                <FaMoneyBillWave className="text-4xl mx-auto mb-2 text-[#d2a679]" />
+                <p className="text-center font-semibold">Cash</p>
+              </button>
+
+              {/* Bkash */}
+              <button
+                onClick={() => setPaymentMethod("bkash")}
+                className={`p-4 rounded-lg border-2 transition ${
+                  paymentMethod === "bkash"
+                    ? "border-[#d2a679] bg-[#2a2a2a]"
+                    : "border-gray-700 hover:border-gray-600"
+                }`}
+              >
+                <FaMobileAlt className="text-4xl mx-auto mb-2 text-[#d2a679]" />
+                <p className="text-center font-semibold">Bkash</p>
+              </button>
+            </div>
           </div>
 
           {/* Grand Total */}
