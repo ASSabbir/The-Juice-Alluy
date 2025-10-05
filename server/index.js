@@ -72,6 +72,25 @@ async function run() {
       res.send(result);
     });
 
+    // Update user by email
+app.put('/users/:email', async (req, res) => {
+  const email = req.params.email;
+  const updatedUser = req.body;
+  const filter = { email: email };
+  const updateDoc = {
+    $set: {
+      displayName: updatedUser.displayName,
+      photoURL: updatedUser.photoURL,
+      role: updatedUser.role,
+    },
+  };
+  const result = await usersCollections.updateOne(filter, updateDoc, {
+    upsert: true,
+  });
+  res.send(result);
+});
+
+
     // Add item to cart
     app.post('/cart', async (req, res) => {
       try {
@@ -94,25 +113,43 @@ async function run() {
     });
 
     // Get cart items by user email
-    app.get('/cart/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email: email };
-      const result = await cartCollections.find(query).toArray();
-      res.send(result);
-    });
+    app.get("/cart/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const query = { userEmail: email };
+    const cartItems = await cartCollections.find(query).toArray();
+    res.send(cartItems);
+  } catch (error) {
+    console.error("Error fetching user cart:", error);
+    res.status(500).send({ error: "Failed to fetch user cart" });
+  }
+});
 
     // Delete item from cart
     app.delete("/cart/:id", async (req, res) => {
-      try {
-        const id = req.params.id;
-        const query = { _id: new ObjectId(id) };
-        const result = await cartCollections.deleteOne(query);
-        res.send(result);
-      } catch (error) {
-        console.error("Error deleting from cart:", error);
-        res.status(500).send({ error: "Failed to delete item from cart" });
-      }
-    });
+  try {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await cartCollections.deleteOne(query);
+    res.send(result);
+  } catch (error) {
+    console.error("Error deleting cart item:", error);
+    res.status(500).send({ error: "Failed to delete cart item" });
+  }
+});
+
+//Clear all cart items for a specific user
+app.delete("/cart/clear/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const query = { userEmail: email };
+    const result = await cartCollections.deleteMany(query);
+    res.send(result);
+  } catch (error) {
+    console.error("Error clearing user cart:", error);
+    res.status(500).send({ error: "Failed to clear user cart" });
+  }
+});
 
     app.get("/best_products", async (req, res) => {
       const result = await coffeesCollections.find({}).limit(4).toArray()

@@ -1,16 +1,18 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Rating, ThinStar } from "@smastrom/react-rating";
 import { TbCurrencyTaka } from "react-icons/tb";
+import { AuthContext } from "../../providers/AuthContext";
+
 
 const CoffeeDetails = () => {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
   const [coffee, setCoffee] = useState(null);
   const [activeTab, setActiveTab] = useState("description");
-  const [quantity, setQuantity] = useState(1);
   const myStyles = {
     itemShapes: ThinStar,
     activeFillColor: "#dbad6a",
@@ -18,6 +20,8 @@ const CoffeeDetails = () => {
   };
 
   const navigate = useNavigate();
+
+  // Fetch specific coffee by ID
   useEffect(() => {
     const getCoffee = async () => {
       try {
@@ -27,34 +31,48 @@ const CoffeeDetails = () => {
         console.error("Error fetching coffee details:", error);
       }
     };
-
     getCoffee();
   }, [id]);
 
-  //Add to Cart Function
+  //Add to Cart Function (with user info)
   const handleAddToCart = async () => {
-    if (!coffee) return;
-
-    // Save to LocalStorage
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const exists = cart.find((item) => item._id === coffee._id);
-    if (!exists) {
-      cart.push(coffee);
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-
-    // Save to MongoDB
-    try {
-      await axios.post("http://localhost:5000/cart", coffee);
+    if (!coffee || !user) {
       Swal.fire({
-        icon: "success",
-        title: "Added to Cart!",
-        text: `${coffee.title} has been added to your cart.`,
-        background: "#1a1a1a",
-        color: "#d2a679",
+        icon: "warning",
+        title: "Please Login!",
+        text: "You need to login before adding to cart.",
         confirmButtonColor: "#d2a679",
       });
+      return;
+    }
+
+    const cartItem = {
+      coffeeId: coffee._id,
+      title: coffee.title,
+      image: coffee.image,
+      price: coffee.price,
+      category: coffee.category,
+      rating: coffee.rating,
+      date: new Date().toISOString(),
+      userEmail: user.email,
+      userName: user.displayName || "Unknown User",
+      userPhoto: user.photoURL || "/default-avatar.png",
+    };
+
+    try {
+      const res = await axios.post("http://localhost:5000/cart", cartItem);
+      if (res.data.insertedId) {
+        Swal.fire({
+          icon: "success",
+          title: "Added to Cart!",
+          text: `${coffee.title} has been added to your cart.`,
+          background: "#1a1a1a",
+          color: "#d2a679",
+          confirmButtonColor: "#d2a679",
+        });
+      }
     } catch (error) {
+      console.error("Error adding to cart:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -65,9 +83,10 @@ const CoffeeDetails = () => {
 
   if (!coffee)
     return <p className="text-center mt-10 text-white">Loading...</p>;
-  console.log(coffee);
+
   return (
     <div className="bg-[#0f0f0f] min-h-screen">
+      {/* Banner Section */}
       <div className="relative bg-backgrondDark h-96 flex flex-col justify-center items-center">
         <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/business-banner.jpg')] bg-bottom bg-no-repeat bg-cover filter grayscale"></div>
         <h2 className="relative text-5xl text-center font-moglan text-white">
@@ -78,6 +97,7 @@ const CoffeeDetails = () => {
       {/* Product Details Section */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Image */}
           <div className="bg-backgrondLight flex items-center justify-center p-12 rounded-lg">
             <img
               src={coffee.image}
@@ -86,16 +106,16 @@ const CoffeeDetails = () => {
             />
           </div>
 
+          {/* Text Info */}
           <div className="text-white space-y-6">
-            {/* Description Text */}
-            <p className="text-3xl  font-bold text-lightCoffee">
+            <p className="text-3xl font-bold text-lightCoffee">
               {coffee.title}
             </p>
             <p className="text-text-tertiary text-base leading-relaxed">
               {coffee.description}
             </p>
 
-            {/* Reviews */}
+            {/* Rating */}
             <div className="flex items-center gap-2">
               <Rating
                 style={{ maxWidth: 90 }}
@@ -111,10 +131,10 @@ const CoffeeDetails = () => {
             {/* Price */}
             <div className="flex items-center">
               <TbCurrencyTaka className="text-2xl" />
-              <p className="font- text-2xl ">{coffee.price}</p>
+              <p className="font- text-2xl">{coffee.price}</p>
             </div>
 
-            {/* Add to Cart Section */}
+            {/*Add to Cart Button (no quantity) */}
             <div className="flex items-center gap-4">
               <button
                 onClick={handleAddToCart}
@@ -122,14 +142,9 @@ const CoffeeDetails = () => {
               >
                 Add to Cart
               </button>
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                className="w-20 bg-darkCoffee border border-gray-600 text-white text-center py-3 rounded"
-              />
             </div>
+
+            {/* Order Now */}
             <button
               onClick={() =>
                 navigate(`/order/${coffee._id}`, {
@@ -141,15 +156,7 @@ const CoffeeDetails = () => {
               Order Now
             </button>
 
-            
-            {/* <button
-                onClick={handleAddToCart}
-                className="flex-1 bg-gradient-to-r w-full from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
-              >
-                Order Now
-              </button> */}
-
-            {/*  Categories */}
+            {/* Category */}
             <div className="space-y-2 text-sm border-t border-gray-700 pt-6">
               <p className="text-gray-400">
                 <span className="font-semibold">Category :</span>{" "}
@@ -161,7 +168,6 @@ const CoffeeDetails = () => {
 
         {/* Tabs Section */}
         <div className="mt-16">
-          {/* Tab Headers */}
           <div className="border-b border-gray-700">
             <div className="flex gap-8">
               <button

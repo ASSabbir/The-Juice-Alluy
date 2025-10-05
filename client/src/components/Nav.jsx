@@ -118,7 +118,7 @@ const Nav = () => {
           <li>
             <button
               onClick={handleLogOut}
-              className="px-4 py-2 hover:bg-red-600/20 rounded-md transition duration-300 text-red-400 hover:text-red-300"
+              className="font-bold px-4 py-2 hover:bg-red-600/20 rounded-md transition duration-300 text-red-500 hover:text-red-300"
             >
               Sign Out
             </button>
