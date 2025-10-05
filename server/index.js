@@ -23,9 +23,9 @@ async function run() {
   try {
     const database = client.db("JuiceAlluy");
     const coffeesCollections = database.collection("coffees");
-                                                              
-    const cartCollections = database.collection("carts");
 
+    const cartCollections = database.collection("carts");
+    const ordersCollections = database.collection("orders");
     //Get all coffees
     app.get('/coffee', async (req, res) => {
       const coffee = await coffeesCollections.find().toArray();
@@ -156,6 +156,23 @@ app.delete("/cart/clear/:email", async (req, res) => {
       console.log(result)
       res.send(result);
     })
+
+
+    app.post('/orders', async (req, res) => {
+      try {
+        const orderData = req.body;
+        const result = await ordersCollections.insertOne(orderData);
+        res.status(201).json({
+          message: "Order placed successfully",
+          orderId: result.insertedId
+        });
+      } catch (error) {
+        console.error("Error placing order:", error);
+        res.status(500).json({ error: "Failed to place order" });
+      }
+    });
+
+
     console.log("Connected to MongoDB successfully!");
 
 
