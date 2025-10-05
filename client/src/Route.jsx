@@ -1,8 +1,4 @@
-
-import {
-  createBrowserRouter,
-
-} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Root from "./Root";
 import Home from "./pages/Home/Home";
 import Shop from "./pages/Shop/Shop";
@@ -12,52 +8,56 @@ import CoffeeDetails from "./pages/Shop/CoffeeDetails";
 
 import AdminDashboard from "./components/dashboard/AdminDashboard";
 import AddProduct from "./components/dashboard/Admin/AddProduct/AddProduct";
-import AddToCart from './pages/Shop/AddToCart';
+import AddToCart from "./pages/Shop/AddToCart";
 import UserProfile from "./components/dashboard/User/UserProfile";
-
+import Order from "./pages/Shop/Order";
 
 export const Route = createBrowserRouter([
   {
     path: "/",
     element: <Root></Root>,
-    children:[
-        {
-            path:'/',
-            element:<Home></Home>,
-        },{
-            path:'/shop',
-            element:<Shop></Shop>
-        },{
-            path:'/login',
-            element:<Login></Login>
-        },
-        {
-            path:'/register',
-            element:<Register></Register>
-        },
-        {
-            path:"/coffee/:id",
-            element:<CoffeeDetails/>
-        },
-        {
-            path:"/cart",
-            element:<AddToCart/>
-        },
+    children: [
+      {
+        path: "/",
+        element: <Home></Home>,
+      },
+      {
+        path: "/shop",
+        element: <Shop></Shop>,
+      },
+      {
+        path: "/login",
+        element: <Login></Login>,
+      },
+      {
+        path: "/register",
+        element: <Register></Register>,
+      },
+      {
+        path: "/coffee/:id",
+        element: <CoffeeDetails />,
+      },
+      {
+        path: "/cart",
+        element: <AddToCart />,
+      },
 
-        {
-            path:"/dashboard",
-            element:<AdminDashboard/>
-        },
-        {
-            path:"/profile",
-            element: <UserProfile></UserProfile>
-        },
-        {
-            path:"/add-coffee",
-            element:<AddProduct/>
-        }
-
-
-    ]
+      {
+        path: "/dashboard",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "/profile",
+        element: <UserProfile></UserProfile>,
+      },
+      {
+        path: "/add-coffee",
+        element: <AddProduct />,
+      },
+      {
+        path: "/order/:id",
+        element: <Order></Order>,
+      },
+    ],
   },
 ]);

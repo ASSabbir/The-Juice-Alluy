@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Rating, ThinStar } from '@smastrom/react-rating'
-
+import { TbCurrencyTaka } from "react-icons/tb";
 import '@smastrom/react-rating/style.css'
 const Card = ({ coffee }) => {
 
@@ -17,16 +16,16 @@ const Card = ({ coffee }) => {
       className="  max-w-96 w-full overflow-hidden"
     >
       <NavLink to={`/coffee/${coffee._id}`}>
-        <figure className='w- h-96 overflow-hidden'>
+        <figure className='w- h-96 flex justify-center items-center bg-backgrondDark overflow-hidden'>
           <img
             src={coffee.image}
-            alt={coffee.name}
-            className=" w-full  h-full object-center object-cover  hover:scale-[1.09] duration-500 transition"
+            alt={coffee.title}
+            className="w-75 object-center object-cover  hover:scale-[1.09] duration-500 transition"
           />
         </figure>
       </NavLink>
       <div className=" text-white font-urbanist mt-5 px-2 space-y-3">
-        <h3 className="text-xl font-bold t">{coffee.name}</h3>
+        <h3 className="text-xl font-bold t">{coffee.title}</h3>
 
         <Rating
           style={{ maxWidth: 90 }}
@@ -35,12 +34,16 @@ const Card = ({ coffee }) => {
           value={coffee.rating}
         />
 
-        <p className="font- text-lg ">
-          $ {coffee.price}
-        </p>
+        <div className='flex items-center'>
+          <TbCurrencyTaka className='text-xl'/>
+          <p className="font- text-lg ">
+
+            {coffee.price}
+          </p>
+        </div>
 
         {/* <div className="card-actions justify-end mt-4">
-          
+
         </div> */}
       </div>
     </div>
