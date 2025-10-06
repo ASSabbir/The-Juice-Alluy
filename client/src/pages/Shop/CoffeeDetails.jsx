@@ -34,52 +34,57 @@ const CoffeeDetails = () => {
     getCoffee();
   }, [id]);
 
-  //Add to Cart Function (with user info)
-  const handleAddToCart = async () => {
-    if (!coffee || !user) {
-      Swal.fire({
-        icon: "warning",
-        title: "Please Login!",
-        text: "You need to login before adding to cart.",
-        confirmButtonColor: "#d2a679",
-      });
-      return;
-    }
+// Add to Cart Function (with user info)
+const handleAddToCart = async () => {
+  if (!coffee || !user) {
+    Swal.fire({
+      icon: "warning",
+      title: "Please Login!",
+      text: "You need to login before adding to cart.",
+      confirmButtonColor: "#d2a679",
+    });
+    return;
+  }
 
-    const cartItem = {
-      coffeeId: coffee._id,
-      title: coffee.title,
-      image: coffee.image,
-      price: coffee.price,
-      category: coffee.category,
-      rating: coffee.rating,
-      date: new Date().toISOString(),
-      userEmail: user.email,
-      userName: user.displayName || "Unknown User",
-      userPhoto: user.photoURL || "/default-avatar.png",
-    };
-
-    try {
-      const res = await axios.post("http://localhost:5000/cart", cartItem);
-      if (res.data.insertedId) {
-        Swal.fire({
-          icon: "success",
-          title: "Added to Cart!",
-          text: `${coffee.title} has been added to your cart.`,
-          background: "#1a1a1a",
-          color: "#d2a679",
-          confirmButtonColor: "#d2a679",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to add item to cart!",
-      });
-    }
+  const cartItem = {
+    coffeeId: coffee._id,
+    title: coffee.title,
+    image: coffee.image,
+    price: coffee.price,
+    category: coffee.category,
+    rating: coffee.rating,
+    date: new Date().toISOString(),
+    userEmail: user.email,
+    userName: user.displayName || "Unknown User",
+    userPhoto: user.photoURL || "/default-avatar.png",
   };
+
+  try {
+    const res = await axios.post("http://localhost:5000/cart", cartItem);
+    if (res.data.insertedId || res.data.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Added to Cart!",
+        text: `${coffee.title} has been added to your cart.`,
+        background: "#1a1a1a",
+        color: "#d2a679",
+        confirmButtonColor: "#d2a679",
+      }).then(() => {
+        
+        window.location.reload();
+      });
+    }
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Failed to add item to cart!",
+      confirmButtonColor: "#d2a679",
+    });
+  }
+};
+
 
   if (!coffee)
     return <p className="text-center mt-10 text-white">Loading...</p>;

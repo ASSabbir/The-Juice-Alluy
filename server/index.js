@@ -23,10 +23,15 @@ async function run() {
   try {
     const database = client.db("JuiceAlluy");
     const coffeesCollections = database.collection("coffees");
-
     const cartCollections = database.collection("carts");
     const orderCollections = database.collection("orders");
-    const ordersCollections = database.collection("orders");
+    const pendingOrdersCollection = database.collection("pendingOrders");
+    const usersCollection = database.collection("users");
+    const progressOrdersCollections = database.collection("progressOrders");
+
+
+
+
     //Get all coffees
     app.get('/coffee', async (req, res) => {
       const coffee = await coffeesCollections.find().toArray();
@@ -73,23 +78,28 @@ async function run() {
       res.send(result);
     });
 
-    // Update user by email
-app.put('/users/:email', async (req, res) => {
-  const email = req.params.email;
-  const updatedUser = req.body;
-  const filter = { email: email };
-  const updateDoc = {
-    $set: {
-      displayName: updatedUser.displayName,
-      photoURL: updatedUser.photoURL,
-      role: updatedUser.role,
-    },
-  };
-  const result = await usersCollections.updateOne(filter, updateDoc, {
-    upsert: true,
-  });
-  res.send(result);
+    // Update user's display name
+app.put("/users/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const { displayName } = req.body;
+
+    const result = await usersCollection.updateOne(
+      { email },
+      { $set: { displayName } }
+    );
+
+    res.send({
+      success: true,
+      message: "Name updated successfully",
+      result,
+    });
+  } catch (error) {
+    console.error("Error updating name:", error);
+    res.status(500).send({ error: "Failed to update name" });
+  }
 });
+
 
 
     // Add item to cart
@@ -153,6 +163,62 @@ app.delete("/cart/clear/:email", async (req, res) => {
 });
 
 
+// Add new pending order
+app.post("/pending-orders", async (req, res) => {
+  try {
+    console.log("Incoming Pending Order:", req.body);
+
+    const order = req.body;
+
+    if (!order || !order.items || order.items.length === 0) {
+      return res.status(400).send({ error: "Order data is invalid" });
+    }
+
+    const result = await pendingOrdersCollection.insertOne(order);
+    res.status(201).send({
+      success: true,
+      message: "Pending order placed successfully",
+      orderId: result.insertedId,
+    });
+  } catch (error) {
+    console.error("Error creating pending order:", error);
+    res.status(500).send({ error: "Failed to create pending order" });
+  }
+});
+
+// Get user orders by email (searches across all collections)
+app.get('/user/orders/:email', async (req, res) => {
+  try {
+    const email = req.params.email;
+    const query = { customerEmail: email }; // or userEmail - match your field name
+
+    // Search all three collections
+    const [pendingOrders, progressOrders, completedOrders] = await Promise.all([
+      pendingOrdersCollection.find(query).toArray(),
+      progressOrdersCollections.find(query).toArray(),
+      orderCollections.find(query).toArray()
+    ]);
+
+    // Combine all orders
+    const allUserOrders = [
+      ...pendingOrders,
+      ...progressOrders,
+      ...completedOrders
+    ];
+
+    // Sort by date (newest first)
+    allUserOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+    res.send(allUserOrders);
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ error: "Failed to fetch user orders" });
+  }
+});
+
+
+
+
 //Add new order
 app.post("/orders", async (req, res) => {
   try {
@@ -177,6 +243,7 @@ app.post("/orders", async (req, res) => {
 });
 
 
+
     app.get("/best_products", async (req, res) => {
       const result = await coffeesCollections.find({}).limit(4).toArray()
       console.log(result)
@@ -184,25 +251,7 @@ app.post("/orders", async (req, res) => {
     })
 
 
-    app.post('/orders', async (req, res) => {
-      try {
-        const orderData = req.body;
-        const result = await ordersCollections.insertOne(orderData);
-        res.status(201).json({
-          message: "Order placed successfully",
-          orderId: result.insertedId
-        });
-      } catch (error) {
-        console.error("Error placing order:", error);
-        res.status(500).json({ error: "Failed to place order" });
-      }
-    });
-
-
     console.log("Connected to MongoDB successfully!");
-
-
-
 
   } finally {
     // await client.close(); // keep connection open for server
