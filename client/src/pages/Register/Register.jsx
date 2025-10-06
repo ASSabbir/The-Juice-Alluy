@@ -152,10 +152,10 @@ const Register = () => {
         </h2>
         
 
-        <form onSubmit={handleFormSubmit} className="grid-cols-2 grid mt-15 gap-7 space-x-7">
+        <form onSubmit={handleFormSubmit} className="grid-cols-2 grid mt-15 gap-12 ">
           {/* Name */}
           <div>
-            <label className="block text-gray-300 mb-2">Full Name</label>
+            
             <div className="flex items-center  border-b border-[#333]  px-4">
               <FaUser className="text-[#d2a679] mr-3" />
               <input
@@ -169,7 +169,7 @@ const Register = () => {
 
           {/* Email */}
           <div>
-            <label className="block text-gray-300 mb-2">Email Address</label>
+            
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
@@ -183,7 +183,7 @@ const Register = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-gray-300 mb-2">Password</label>
+           
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
@@ -204,7 +204,7 @@ const Register = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-gray-300 mb-2">Confirm Password</label>
+            
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
@@ -225,11 +225,12 @@ const Register = () => {
 
           {/* Upload Photo */}
           <div>
-            <label className="block text-gray-300 mb-2">Upload Photo</label>
+            
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaImage className="text-[#d2a679] mr-3" />
               <input
                 type="file"
+                
                 name="photo"
                 className="w-full py-3 text-gray-300 bg-transparent focus:outline-none"
               />
@@ -247,7 +248,7 @@ const Register = () => {
           ) : (
             <button
               type="submit"
-              className="w-full  h-10 mt-10  font-bold text-black text-lg
+              className="w-full  h-10   font-bold text-black text-lg
                        bg-gradient-to-r from-[#d2a679] to-[#b58855]
                        shadow-md 
                        transition duration-300"
