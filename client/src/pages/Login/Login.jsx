@@ -94,17 +94,17 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center relative bg-cover bg-center"
+      className="min-h-screen w-full flex items-center justify-start md:px-[20vw] relative bg-cover bg-center"
       style={{
         backgroundImage:
-          "url('/36.jpg')",
+          "url('/12.png')",
       }}
     >
       {/* Dark Shadow Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+      <div className="absolute inset-0 bg-black/20"></div>
 
       {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md bg-black/50 backdrop-blur-md  shadow-2xl p-8 mx-4 my-32">
+      <div className="relative z-10 w-full max-w-md  border-[1px]  border-zinc-700 backdrop-blur-md  shadow-2xl p-8 mx-4 my-32">
         {/* Typewriter Heading */}
         <h2 className="text-4xl font-bol  text-center mb-6 text-white drop-shadow-lg">
           Sign In 
@@ -181,7 +181,7 @@ const Login = () => {
           <button
             onClick={handelgoogle}
             aria-label="Log in with Google"
-            className="relative group p-3 rounded-full shadow-lg hover:scale-110 transition"
+            className="relative group p-3 rounded-full shadow-lg cursor-pointer transition"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
