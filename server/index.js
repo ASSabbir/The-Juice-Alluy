@@ -40,7 +40,6 @@ async function run() {
 
 
     // Products add and get api
-
     app.post('/coffee', async (req, res) => {
       const data = req.body
       console.log(data)
@@ -48,16 +47,37 @@ async function run() {
       res.send(result)
     })
 
+// Get all coffees
+app.get("/coffees", async (req, res) => {
+  try {
+    const coffees = await coffeesCollections.find().toArray();
+    res.send(coffees);
+  } catch (error) {
+    console.error("Error fetching coffees:", error);
+    res.status(500).send({ message: "Failed to fetch coffees" });
+  }
+});
+
+
+
 
 
 
     //Get single coffee by ID
     app.get('/coffee/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const coffee = await coffeesCollections.findOne(query);
-      res.send(coffee);
-    });
+  try {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const coffee = await coffeesCollections.findOne(query);
+    if (!coffee) {
+      return res.status(404).send({ message: 'Coffee not found' });
+    }
+    res.send(coffee);
+  } catch (error) {
+    console.error('Error fetching coffee:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
 
     //Get all users
     app.get('/users', async (req, res) => {
