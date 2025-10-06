@@ -4,7 +4,7 @@ import { TbCurrencyTaka } from "react-icons/tb";
 import '@smastrom/react-rating/style.css'
 const Card = ({ coffee }) => {
 
-  console.log(coffee)
+  // console.log(coffee)
   const myStyles = {
     itemShapes: ThinStar,
     activeFillColor: '#dbad6a',
@@ -16,16 +16,16 @@ const Card = ({ coffee }) => {
       className="  max-w-96 w-full overflow-hidden"
     >
       <NavLink to={`/coffee/${coffee._id}`}>
-        <figure className='w- h-96 flex justify-center items-center bg-backgrondDark overflow-hidden'>
+        <figure className=' h-25 sm:h-45 md:h-96 flex justify-center items-center bg-backgrondDark overflow-hidden'>
           <img
             src={coffee.image}
             alt={coffee.title}
-            className="w-75 object-center object-cover  hover:scale-[1.09] duration-500 transition"
+            className="h-full object-center object-cover  hover:scale-[1.09] duration-500 transition"
           />
         </figure>
       </NavLink>
       <div className=" text-white font-urbanist mt-5 px-2 space-y-3">
-        <h3 className="text-xl font-bold t">{coffee.title}</h3>
+        <h3 className="sm:text-xl font-bold t">{coffee.title}</h3>
 
         <Rating
           style={{ maxWidth: 90 }}
@@ -35,7 +35,7 @@ const Card = ({ coffee }) => {
         />
 
         <div className='flex items-center'>
-          <TbCurrencyTaka className='text-xl'/>
+          <TbCurrencyTaka className='text-l sm:text-xl'/>
           <p className="font- text-lg ">
 
             {coffee.price}
