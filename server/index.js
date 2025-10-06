@@ -28,8 +28,19 @@ async function run() {
     const pendingOrdersCollection = database.collection("pendingOrders");
     const usersCollection = database.collection("users");
     const progressOrdersCollections = database.collection("progressOrders");
+    const juiceCollection = database.collection("juice");
 
 
+// get all juice items
+    app.get('/juice', async (req, res) => {
+  try {
+    const juices = await juiceCollection.find().toArray();
+    res.send(juices);
+  } catch (error) {
+    console.error("Error fetching juice items:", error);
+    res.status(500).send({ message: "Failed to fetch juice items", error });
+  }
+});
 
 
     //Get all coffees
