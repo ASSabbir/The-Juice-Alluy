@@ -6,10 +6,11 @@ import axios from "axios";
 const UserProfile = () => {
   const { user } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
+  const [coffees, setCoffees] = useState([]);
   const [editingName, setEditingName] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
 
-  // Fetch user's pending orders
+  // Fetch user's orders
   useEffect(() => {
     if (user?.email) {
       axios
@@ -19,13 +20,20 @@ const UserProfile = () => {
     }
   }, [user?.email]);
 
+  // Fetch all coffees
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/coffees")
+      .then((res) => setCoffees(res.data))
+      .catch((err) => console.error("Error fetching coffees:", err));
+  }, []);
+
   // Handle name update
   const handleUpdateName = async () => {
     try {
       await axios.put(`http://localhost:5000/users/${user.email}`, {
         displayName,
       });
-
       Swal.fire({
         title: "Updated!",
         text: "Your name has been successfully updated.",
@@ -34,15 +42,12 @@ const UserProfile = () => {
       });
       setEditingName(false);
     } catch (error) {
-      console.error("Error updating name:", error);
       Swal.fire("Error", "Failed to update name.", "error");
     }
   };
 
-  // Fallback name if empty
   const displayUserName = displayName?.trim() !== "" ? displayName : "Your Name";
 
-  // Fallback photo: first letter of email
   const renderProfilePhoto = () => {
     if (user?.photoURL) {
       return (
@@ -70,6 +75,16 @@ const UserProfile = () => {
     }
   };
 
+  // Match order item IDs with coffees collection
+  const getItemNames = (items) => {
+    return items.map((item) => {
+      const matchedCoffee = coffees.find((c) => c._id === item.id);
+      return matchedCoffee
+        ? ` ${matchedCoffee.title} (x${item.quantity})`
+        : ` Unknown Item (x${item.quantity})`;
+    });
+  };
+
   return (
     <div className="text-white min-h-screen bg-gradient-to-br from-black via-[#3e2723] to-black">
       {/* Banner */}
@@ -80,15 +95,15 @@ const UserProfile = () => {
         </h2>
       </div>
 
-      {/* Profile Section */}
+      {/* Profile Card */}
       <div className="relative -mt-20 px-6 py-10">
-        <div className="bg-black/5 backdrop-blur-lg border-2 border-[#5c4033] hover:border-[#8B4513] transition duration-500 rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto group">
+        <div className="bg-black/5 hover:border-[#8B4513] transition duration-500 rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto group">
           <div className="flex flex-col items-center -mt-20">
-            <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-[#8B4513] shadow-lg group-hover:scale-105 group-hover:shadow-[0_0_25px_#8B4513] transition duration-500">
+            <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-[#8B4513] shadow-lg">
               {renderProfilePhoto()}
             </div>
 
-            {/* Editable Name */}
+            {/* Name */}
             <div className="mt-4 flex items-center gap-2">
               {editingName ? (
                 <>
@@ -113,7 +128,7 @@ const UserProfile = () => {
                 </>
               ) : (
                 <>
-                  <h3 className="text-2xl font-bold text-[#d7ccc8] group-hover:text-white transition">
+                  <h3 className="text-2xl font-bold text-[#d7ccc8]">
                     {displayUserName}
                   </h3>
                   <button
@@ -131,11 +146,11 @@ const UserProfile = () => {
         </div>
       </div>
 
-      {/* Orders Section */}
+      {/* Orders Table */}
       <div className="px-6 pb-12">
         <div className="bg-black/5 border-2 border-[#5c4033] rounded-2xl shadow-2xl max-w-6xl mx-auto p-8 hover:border-[#8B4513] hover:shadow-[0_0_20px_#8B4513] transition duration-500">
           <h4 className="text-2xl font-semibold mb-6 text-[#d7ccc8]">
-            Pending Orders
+            Orders History
           </h4>
 
           {orders.length > 0 ? (
@@ -152,30 +167,23 @@ const UserProfile = () => {
                 </thead>
                 <tbody className="bg-black/60 text-gray-200">
                   {orders.map((order) => (
-                    <tr
-                      key={order._id}
-                      className="hover:bg-[#3e2723] hover:text-white transition duration-300"
-                    >
+                    <tr key={order._id} className="hover:bg-[#3e2723] transition">
                       <td className="py-3 px-4">
-                        {order.items
-                          ?.map((item) => `${item.name} (x${item.quantity})`)
-                          .join(", ")}
+                        <ul className="list-disc list-inside space-y-1">
+                          {getItemNames(order.items).map((name, i) => (
+                            <li key={i}>{name}</li>
+                          ))}
+                        </ul>
                       </td>
                       <td className="py-3 px-4">
-                        {order.orderDate
-                          ? new Date(order.orderDate).toLocaleDateString()
-                          : "N/A"}
+                        {new Date(order.orderDate).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4 capitalize">
-                        {order.paymentMethod || "N/A"}
+                        {order.paymentMethod}
                       </td>
-                      <td className="py-3 px-4 capitalize">
-                        {order.status || "Pending"}
-                      </td>
+                      <td className="py-3 px-4 capitalize">{order.status}</td>
                       <td className="py-3 px-4 font-semibold">
-                        {order.grandTotal
-                          ? parseFloat(order.grandTotal).toFixed(2)
-                          : "0.00"}
+                        {parseFloat(order.grandTotal).toFixed(2)}
                       </td>
                     </tr>
                   ))}
