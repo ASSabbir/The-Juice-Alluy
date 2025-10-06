@@ -28,9 +28,9 @@ const Shop = () => {
         <h2 className="relative text-5xl text-center font-moglan text-white  ">
           Our Menu
         </h2>
-        <div className="breadcrumbs  text-white text- font-urbanist mt-4">
+        <div className="breadcrumbs relative  text-zinc-400  text- font-urbanist mt-4">
           <ul>
-            <li><a href="/">Home</a></li>
+            <li><a href="/" className=" ">Home</a></li>
 
             <li>Shop</li>
           </ul>
@@ -47,7 +47,7 @@ const Shop = () => {
 
           </select>
         </div>
-        <div className="grid bg-[#1a1a1a] space-y-20  grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid bg-[#1a1a1a] space-y-20  grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {coffees.map((coffee) => <Card key={coffee._id} coffee={coffee}></Card>)}
         </div>
       </div>
