@@ -120,7 +120,7 @@ const AddToCart = () => {
 
       // Save to database
       const response = await axios.post(
-        "http://localhost:5000/orders",
+        "http://localhost:5000/pending-orders",
         orderData
       );
 
@@ -343,7 +343,7 @@ const AddToCart = () => {
             onClick={handlePayNow}
             className="w-full mt-6 bg-gradient-to-r from-[#d2a679] to-[#b58855] text-black font-bold py-3 rounded-lg hover:scale-105 transition"
           >
-            Pay Now
+            Order Now
           </button>
         </div>
       </div>

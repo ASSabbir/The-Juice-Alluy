@@ -97,7 +97,7 @@ const handleOrderNow = async () => {
       customerPhoto: user?.photoURL || null,
     };
 
-    const response = await axios.post("http://localhost:5000/orders", orderData, {
+    const response = await axios.post("http://localhost:5000/pending-orders", orderData, {
       headers: { "Content-Type": "application/json" },
     });
 
