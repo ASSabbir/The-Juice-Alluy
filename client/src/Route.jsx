@@ -11,6 +11,7 @@ import AddProduct from "./components/dashboard/Admin/AddProduct/AddProduct";
 import AddToCart from "./pages/Shop/AddToCart";
 import UserProfile from "./components/dashboard/User/UserProfile";
 import Order from "./pages/Shop/Order";
+import About from "./pages/About/About";
 
 export const Route = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ export const Route = createBrowserRouter([
       {
         path: "/add-coffee",
         element: <AddProduct />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/order/:id",

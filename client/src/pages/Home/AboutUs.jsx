@@ -2,6 +2,7 @@ import img from '/pexels-pavel-danilyuk-6612648.jpg'
 import { FiCoffee } from "react-icons/fi";
 import { CiCoffeeCup } from "react-icons/ci";
 import { GoClock } from "react-icons/go";
+import { NavLink } from "react-router-dom";
 
 const AboutUs = () => {
     return (
@@ -33,7 +34,10 @@ const AboutUs = () => {
                         </div>
                     </div>
                     <div className='mt-12'>
-                        <button className='bg-lightCoffee text-backgrondDark px-5 py-2 rounded-full'>More About Us</button>
+                        <NavLink to='/about' className='mr-5 text-backgrondDark font-semibold underline'>Learn More
+                            <button className='bg-lightCoffee text-backgrondDark px-5 py-2 rounded-full'>More About Us</button>
+                        </NavLink>
+                        
                     </div>
                 </div>
                 <div className='md:w-1/2 h relative flex flex-col md:flex-row justify-center items-center'>
