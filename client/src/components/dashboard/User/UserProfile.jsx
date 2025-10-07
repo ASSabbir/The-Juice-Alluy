@@ -86,10 +86,10 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="text-white min-h-screen bg-gradient-to-br from-black via-[#3e2723] to-black">
+    <div className="text-white min-h-screen from-black via-[#3e2723] to-black bg-[url('/bg-2.jpg')]  w-full  bg-center ">
       {/* Banner */}
       <div className="relative h-64 flex flex-col justify-center items-center">
-        <div className="absolute inset-0 bg-[url('/business-banner.jpg')] bg-cover bg-center opacity-40"></div>
+        <div className="absolute inset-0 bg-[url('/business-banner.jpg')] bg-cover bg-center opacity-40 filter grayscale"></div>
         <h2 className="font-moglan relative text-5xl font-extrabold text-white drop-shadow-lg">
           My Profile
         </h2>
@@ -147,8 +147,11 @@ const UserProfile = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="px-6 pb-12">
-        <div className="bg-black/5 border-2 border-[#5c4033] rounded-2xl shadow-2xl max-w-6xl mx-auto p-8 hover:border-[#8B4513] hover:shadow-[0_0_20px_#8B4513] transition duration-500">
+      <div className="px-6 pb-12" >
+        <div className="bg-black/5 border-2 border-[#5c4033] rounded-2xl shadow-2xl max-w-6xl mx-auto p-8 hover:border-[#8B4513] hover:shadow-[0_0_20px_#8B4513] transition duration-500" style={{
+        backgroundImage:
+          "url('/12.png')",
+      }} >
           <h4 className="text-2xl font-semibold mb-6 text-[#d7ccc8]">
             Orders History
           </h4>

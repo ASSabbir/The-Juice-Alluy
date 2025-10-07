@@ -169,7 +169,10 @@ const AddToCart = () => {
       {/* Cart Section */}
       <div className="mt-[7vw] bg-bac px-[9vw] grid grid-cols-1 lg:grid-cols-3 gap-10 pb-24">
         {/* LEFT - Cart Items */}
-        <div className="lg:col-span-2 bg-backgrondDark rounded-xl p-6">
+        <div className="lg:col-span-2 bg-backgrondDark rounded-xl p-6" style={{
+        backgroundImage:
+          "url('/12.png')",
+      }} >
           <h2 className="text-2xl font-bold text-[#d2a679] mb-6">Cart Items</h2>
           {cart.length === 0 ? (
             <p className="text-gray-400 italic">Your cart is empty</p>
