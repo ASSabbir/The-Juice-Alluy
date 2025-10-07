@@ -47,6 +47,9 @@ const Card = ({ coffee }) => {
           itemStyles={myStyles}
           value={coffee.rating}
         />
+        <div className="flex items-center">
+          <TbCurrencyTaka className="text-xl" />
+          <p className="text-lg">{coffee.price}</p>
 <<<<<<< HEAD
         <div className="flex items-center">
           <TbCurrencyTaka className="text-xl" />
