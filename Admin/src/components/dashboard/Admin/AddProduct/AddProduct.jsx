@@ -22,7 +22,7 @@ const AddProduct = () => {
     const flavor_profile = e.target.flavor_profile.value
       .split(",")
       .map((f) => f.trim());
-    const roast_level = e.target.roast_level.value;
+    const category = e.target.category.value;
     const ingredients = e.target.ingredients.value
       .split(",")
       .map((i) => i.trim());
@@ -37,7 +37,7 @@ const AddProduct = () => {
       region,
       weight,
       flavor_profile,
-      roast_level,
+      category,
       ingredients,
       health_benefit,
       description,
@@ -142,7 +142,7 @@ const AddProduct = () => {
             <div className="col-span-full sm:col-span-3">
               <label className="text-sm">Roast Level</label>
               <input
-                name="roast_level"
+                name="category"
                 type="text"
                 placeholder="e.g. Medium Roast"
                 className="w-full rounded-md p-2 border border-amber-900 placeholder-amber-950 bg-white text-black"

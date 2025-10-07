@@ -23,10 +23,13 @@ async function run() {
   try {
     const database = client.db("JuiceAlluy");
     const coffeesCollections = database.collection("coffees");
-
     const cartCollections = database.collection("carts");
     const orderCollections = database.collection("orders");
-    const ordersCollections = database.collection("orders");
+    const pendingOrderCollections = database.collection("pendingOrders");
+    const progressOrderCollections = database.collection("progressOrders");
+
+
+
     //Get all coffees
     app.get('/coffee', async (req, res) => {
       const coffee = await coffeesCollections.find().toArray();
@@ -74,22 +77,22 @@ async function run() {
     });
 
     // Update user by email
-app.put('/users/:email', async (req, res) => {
-  const email = req.params.email;
-  const updatedUser = req.body;
-  const filter = { email: email };
-  const updateDoc = {
-    $set: {
-      displayName: updatedUser.displayName,
-      photoURL: updatedUser.photoURL,
-      role: updatedUser.role,
-    },
-  };
-  const result = await usersCollections.updateOne(filter, updateDoc, {
-    upsert: true,
-  });
-  res.send(result);
-});
+    app.put('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const updatedUser = req.body;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: {
+          displayName: updatedUser.displayName,
+          photoURL: updatedUser.photoURL,
+          role: updatedUser.role,
+        },
+      };
+      const result = await usersCollections.updateOne(filter, updateDoc, {
+        upsert: true,
+      });
+      res.send(result);
+    });
 
 
     // Add item to cart
@@ -115,66 +118,87 @@ app.put('/users/:email', async (req, res) => {
 
     // Get cart items by user email
     app.get("/cart/:email", async (req, res) => {
-  try {
-    const email = req.params.email;
-    const query = { userEmail: email };
-    const cartItems = await cartCollections.find(query).toArray();
-    res.send(cartItems);
-  } catch (error) {
-    console.error("Error fetching user cart:", error);
-    res.status(500).send({ error: "Failed to fetch user cart" });
-  }
-});
+      try {
+        const email = req.params.email;
+        const query = { userEmail: email };
+        const cartItems = await cartCollections.find(query).toArray();
+        res.send(cartItems);
+      } catch (error) {
+        console.error("Error fetching user cart:", error);
+        res.status(500).send({ error: "Failed to fetch user cart" });
+      }
+    });
 
     // Delete item from cart
     app.delete("/cart/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const result = await cartCollections.deleteOne(query);
-    res.send(result);
-  } catch (error) {
-    console.error("Error deleting cart item:", error);
-    res.status(500).send({ error: "Failed to delete cart item" });
-  }
-});
-
-//Clear all cart items for a specific user
-app.delete("/cart/clear/:email", async (req, res) => {
-  try {
-    const email = req.params.email;
-    const query = { userEmail: email };
-    const result = await cartCollections.deleteMany(query);
-    res.send(result);
-  } catch (error) {
-    console.error("Error clearing user cart:", error);
-    res.status(500).send({ error: "Failed to clear user cart" });
-  }
-});
-
-
-//Add new order
-app.post("/orders", async (req, res) => {
-  try {
-    console.log("Incoming Order:", req.body);
-
-    const order = req.body;
-
-    if (!order || !order.items || order.items.length === 0) {
-      return res.status(400).send({ error: "Order data is invalid" });
-    }
-
-    const result = await orderCollections.insertOne(order);
-    res.status(201).send({
-      success: true,
-      message: "Order placed successfully",
-      orderId: result.insertedId,
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await cartCollections.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error("Error deleting cart item:", error);
+        res.status(500).send({ error: "Failed to delete cart item" });
+      }
     });
-  } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).send({ error: "Failed to create order" });
-  }
-});
+
+    //Clear all cart items for a specific user
+    app.delete("/cart/clear/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { userEmail: email };
+        const result = await cartCollections.deleteMany(query);
+        res.send(result);
+      } catch (error) {
+        console.error("Error clearing user cart:", error);
+        res.status(500).send({ error: "Failed to clear user cart" });
+      }
+    });
+
+
+
+
+
+
+
+
+    /*
+
+
+// -------------------!Important-------------------
+
+
+
+
+
+
+    //Add new order
+    app.post("/orders", async (req, res) => {
+      try {
+        console.log("Incoming Order:", req.body);
+
+        const order = req.body;
+
+        if (!order || !order.items || order.items.length === 0) {
+          return res.status(400).send({ error: "Order data is invalid" });
+        }
+
+        const result = await orderCollections.insertOne(order);
+        res.status(201).send({
+          success: true,
+          message: "Order placed successfully",
+          orderId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).send({ error: "Failed to create order" });
+      }
+    });
+
+    */
+
+
+
 
 
     app.get("/best_products", async (req, res) => {
@@ -184,19 +208,155 @@ app.post("/orders", async (req, res) => {
     })
 
 
+    // -------------------Admin Routes-------------------
+
+
+
+
+
+    //create orders
+    app.post('/order', async (req, res) => {
+      try {
+        const order = req.body;
+        const result = await orderCollections.insertOne(order);
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching coffees:", error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+
+
+
+
+    // get orders
+    app.get('/orders', async (req, res) => {
+      try {
+        const orders = await orderCollections.find().toArray();
+        res.send(orders);
+
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+
+      }
+    })
+
+    // Update coffee by ID
+    app.put('/coffee/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updatedProduct = req.body;
+        const query = { _id: new ObjectId(id) };
+        const updateDoc = {
+          $set: updatedProduct
+        };
+        const result = await coffeesCollections.updateOne(query, updateDoc);
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating coffee:", error);
+        res.status(500).json({ error: "Failed to update coffee" });
+      }
+    });
+
+    // delete coffee
+    app.delete('/coffees/:id', async (req, res) => {
+      try {
+
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await coffeesCollections.deleteOne(query);
+        res.send(result);
+        console.log("✅ Delete route ready!");
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+
+
+    // -------------------Experimental Routes-------------------
+
+
     app.post('/orders', async (req, res) => {
       try {
         const orderData = req.body;
-        const result = await ordersCollections.insertOne(orderData);
+        const result = await pendingOrderCollections.insertOne(orderData);
         res.status(201).json({
           message: "Order placed successfully",
           orderId: result.insertedId
         });
       } catch (error) {
-        console.error("Error placing order:", error);
         res.status(500).json({ error: "Failed to place order" });
       }
     });
+
+    // Update order status (moves between collections)
+    app.patch('/orders/:id/status', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { status, currentCollection } = req.body;
+        const query = { _id: new ObjectId(id) };
+
+        // Determine source collection
+        let sourceCollection;
+        if (currentCollection === "pending") sourceCollection = pendingOrderCollections;
+        else if (currentCollection === "progress") sourceCollection = progressOrderCollections;
+        else sourceCollection = orderCollections;
+
+        // Get order from source
+        const order = await sourceCollection.findOne(query);
+        if (!order) return res.status(404).json({ error: "Order not found" });
+
+        // Update status
+        order.status = status;
+        order.updatedAt = new Date().toISOString();
+
+        // Determine destination collection
+        let destinationCollection;
+        if (status === "progress") destinationCollection = progressOrderCollections;
+        else if (status === "completed") destinationCollection = orderCollections;
+        else destinationCollection = pendingOrderCollections;
+
+        // Move to destination
+        await destinationCollection.insertOne(order);
+        await sourceCollection.deleteOne(query);
+
+        res.send({ message: "Order status updated successfully" });
+      } catch (error) {
+        res.status(500).json({ error: "Failed to update order status" });
+      }
+    });
+
+    // Get orders by collection
+    app.get('/orders/:collection', async (req, res) => {
+      try {
+        const collection = req.params.collection;
+        let targetCollection;
+
+        if (collection === "pending") targetCollection = pendingOrderCollections;
+        else if (collection === "progress") targetCollection = progressOrderCollections;
+        else if (collection === "completed") targetCollection = orderCollections; // ✅ Add explicit check
+        else return res.status(400).json({ error: "Invalid collection" }); // ✅ Handle invalid requests
+
+        const orders = await targetCollection.find().toArray();
+        res.send(orders);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch orders" });
+      }
+    });
+
+
+
+
+
+
+
+    // ----------------------Experimental Routes End-------------------
+
+
+
+    // ----------------------Admin Routes End-------------------
 
 
     console.log("Connected to MongoDB successfully!");

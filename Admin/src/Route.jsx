@@ -7,6 +7,7 @@ import Private from "./Private/Private";
 import Login from "./components/dashboard/Admin/Login/Login";
 import AllProduct from "./components/dashboard/Admin/AllProduct/AllProduct";
 import EditProduct from "./components/dashboard/Admin/EditProduct/EditProduct";
+import OrdersManagement from "./components/dashboard/Admin/ordermanagement/AdminOrders";
 
 export const Route = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ export const Route = createBrowserRouter([
       {
         path: "edit-product/:id",
         element:<EditProduct></EditProduct>
+      },
+      {
+        path:"/order_management",
+        element:<OrdersManagement></OrdersManagement>
       }
     ],
   },

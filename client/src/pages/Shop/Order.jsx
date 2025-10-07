@@ -293,22 +293,22 @@ const handleOrderNow = async () => {
             )}
           </div>
 
-          {/* Coupon */}
-          <div className="mt-5 flex">
-            <input
-              type="text"
-              placeholder="Enter coupon code"
-              className="flex-grow px-3 py-2 rounded-l-lg bg-gray-800 border border-[#d2a679] text-white"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-            />
-            <button
-              onClick={applyCoupon}
-              className="px-4 py-2 bg-[#d2a679] text-black font-bold rounded-r-lg hover:bg-[#b58855]"
-            >
-              Apply
-            </button>
-          </div>
+            {/* Coupon */}
+            <div className="mt-5 flex">
+              <input
+                type="text"
+                placeholder="Enter coupon code"
+                className="flex-grow px-3 py-2 rounded-l-lg bg-gray-800 border border-[#d2a679] text-white"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value)}
+              />
+              <button
+                onClick={applyCoupon}
+                className="px-4 py-2 bg-[#d2a679] text-black font-bold rounded-r-lg hover:bg-[#b58855]"
+              >
+                Apply
+              </button>
+            </div>
 
           {/* Grand Total */}
           <div className="mt-6 flex justify-between text-xl font-bold text-[#d2a679] border-t border-gray-700 pt-3">
