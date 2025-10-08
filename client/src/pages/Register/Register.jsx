@@ -46,6 +46,7 @@ const Register = () => {
     const password = e.target.password.value;
     const confirm = e.target.confirm.value;
     const photoFile = e.target.photo.files[0];
+    
 
     if (username === "" || email === "" || password === "" || confirm === "" || !photoFile) {
       Toast.fire({ icon: "error", title: "All fields must be filled out." });
@@ -94,7 +95,7 @@ const Register = () => {
               });
 
               // Save user to DB
-              const userDoc = { username, email, photoURL: url };
+              const userDoc = { username, email, photoURL: url,createdAt: new Date() };
               axios
                 .post("http://localhost:5000/users", userDoc)
                 .then((res) => console.log(res.data))
@@ -121,7 +122,7 @@ const Register = () => {
           icon: "success",
           title: `Welcome ${user2.user.displayName}`,
         });
-        const userDoc = { email: user2.user.email, };
+        const userDoc = { email: user2.user.email,createdAt: new Date() };
         axios
           .post("http://localhost:5000/users", userDoc)
           .then((res) => console.log(res.data))
@@ -146,120 +147,116 @@ const Register = () => {
       <div className="absolute inset-0 bg-black/50"></div>
 
       {/* Register Card */}
-      <div className="relative border-[1px] border-[#333] w-full max-w-160 bg-black/20 backdrop-blur-md  shadow-2xl p-8 z-10 my-32">
+      <div className="relative w-full max-w-160 bg-black/20 backdrop-blur-md  shadow-2xl p-8 z-10 my-32">
         <h2 className="text-3xl font- text-center mb-6 text-white drop-shadow-lg">
           Sign Up
         </h2>
 
 
-        <form onSubmit={handleFormSubmit} >
-          <div className="grid-cols-2 grid mt-15 gap-12 ">
-            {/* Name */}
-            <div>
+        <form onSubmit={handleFormSubmit} className="grid-cols-2 grid mt-15 gap-12 ">
+          {/* Name */}
+          <div>
 
-              <div className="flex items-center  border-b border-[#333]  px-4">
-                <FaUser className="text-[#d2a679] mr-3" />
-                <input
-                  type="text"
-                  name="username"
-                  placeholder="Enter your name"
-                  className="w-full py-3 bg-transparent text-white focus:outline-none"
-                />
-              </div>
+            <div className="flex items-center  border-b border-[#333]  px-4">
+              <FaUser className="text-[#d2a679] mr-3" />
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter your name"
+                className="w-full py-3 bg-transparent text-white focus:outline-none"
+              />
             </div>
+          </div>
 
-            {/* Email */}
-            <div>
+          {/* Email */}
+          <div>
 
-              <div className="flex items-center border-b border-[#333]  px-4">
-                <FaEnvelope className="text-[#d2a679] mr-3" />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter your email"
-                  className="w-full py-3 bg-transparent text-white focus:outline-none"
-                />
-              </div>
+            <div className="flex items-center border-b border-[#333]  px-4">
+              <FaEnvelope className="text-[#d2a679] mr-3" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                className="w-full py-3 bg-transparent text-white focus:outline-none"
+              />
             </div>
+          </div>
 
-            {/* Password */}
-            <div>
+          {/* Password */}
+          <div>
 
-              <div className="flex items-center border-b border-[#333]  px-4">
-                <FaLock className="text-[#d2a679] mr-3" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Enter your password"
-                  className="w-full py-3 bg-transparent text-white focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-400 hover:text-[#d2a679] ml-2"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
+            <div className="flex items-center border-b border-[#333]  px-4">
+              <FaLock className="text-[#d2a679] mr-3" />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                className="w-full py-3 bg-transparent text-white focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-gray-400 hover:text-[#d2a679] ml-2"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
+          </div>
 
-            {/* Confirm Password */}
-            <div>
+          {/* Confirm Password */}
+          <div>
 
-              <div className="flex items-center border-b border-[#333]  px-4">
-                <FaLock className="text-[#d2a679] mr-3" />
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  name="confirm"
-                  placeholder="Confirm your password"
-                  className="w-full py-3 bg-transparent text-white focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  className="text-gray-400 hover:text-[#d2a679] ml-2"
-                >
-                  {showConfirm ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
+            <div className="flex items-center border-b border-[#333]  px-4">
+              <FaLock className="text-[#d2a679] mr-3" />
+              <input
+                type={showConfirm ? "text" : "password"}
+                name="confirm"
+                placeholder="Confirm your password"
+                className="w-full py-3 bg-transparent text-white focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="text-gray-400 hover:text-[#d2a679] ml-2"
+              >
+                {showConfirm ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
+          </div>
 
-            {/* Upload Photo */}
-            <div>
+          {/* Upload Photo */}
+          <div>
 
-              <div className="flex items-center border-b border-[#333]  px-4">
-                <FaImage className="text-[#d2a679] mr-3" />
-                <input
-                  type="file"
+            <div className="flex items-center border-b border-[#333]  px-4">
+              <FaImage className="text-[#d2a679] mr-3" />
+              <input
+                type="file"
 
-                  name="photo"
-                  className="w-full py-3 text-gray-300 bg-transparent focus:outline-none"
-                />
-              </div>
+                name="photo"
+                className="w-full py-3 text-gray-300 bg-transparent focus:outline-none"
+              />
             </div>
           </div>
 
           {/* Submit */}
-          <div className="mt-15 w-full  ">
-            {flag ? (
+          {flag ? (
             <button
               disabled
-              className="w-full py-3  font-bold text-black text-lg bg-gray-600"
+              className="w-full py-3 mt-4  font-bold text-black text-lg bg-gray-600"
             >
               <span className="loading loading-bars loading-sm"></span>
             </button>
           ) : (
             <button
               type="submit"
-              className="w-full  h-10 font-bold text-black text-lg
+              className="w-full  h-10   font-bold text-black text-lg
                        bg-gradient-to-r from-[#d2a679] to-[#b58855]
-                       shadow-md 
+                       shadow-md
                        transition duration-300"
             >
               Register
             </button>
           )}
-          </div>
         </form>
 
         {/* Google */}
