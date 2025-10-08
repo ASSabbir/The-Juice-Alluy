@@ -104,7 +104,7 @@ const Login = () => {
       <div className="absolute inset-0 bg-black/20"></div>
 
       {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md  border-[1px]  border-zinc-700 backdrop-blur-md  shadow-2xl p-8 mx-4 my-32">
+      <div className="relative z-10 w-full max-w-md  border-[1px]  border-[#333] backdrop-blur-md  shadow-2xl p-8 mx-4 my-32">
         {/* Typewriter Heading */}
         <h2 className="text-4xl font-bol  text-center mb-6 text-white drop-shadow-lg">
           Sign In 

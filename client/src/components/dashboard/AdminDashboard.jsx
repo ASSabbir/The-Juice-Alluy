@@ -3,68 +3,24 @@ import { Coffee, ShoppingBag, DollarSign, Users, TrendingUp, TrendingDown, Eye, 
 
 const AdminDashboard = () => {
   const [timeFilter, setTimeFilter] = useState('daily');
-  const [salesData, setSalesData] = useState([]);
 
-  // Mock data - REPLACE WITH API CALLS
-  const stats = {
-    totalOrder: { value: 21375, change: 4.33, isPositive: true },
-    newCustomer: { value: 1012, change: 32.40, isPositive: true },
-    totalSales: { value: 24254, change: 25, isPositive: true },
-    todaySales: { value: 1850, change: 12.5, isPositive: true },
-    monthlySales: { value: 45600, change: 18.2, isPositive: true },
-    totalCustomers: { value: 8459, change: 28.7, isPositive: true }
-  };
 
-  const trendingCoffee = [
-    { id: 1, name: 'Cappuccino', price: 85.00, orders: 240, image: '☕' },
-    { id: 2, name: 'Latte', price: 70.50, orders: 220, image: '🥛' },
-    { id: 3, name: 'Frappuccino', price: 82.50, orders: 200, image: '🧊' },
-    { id: 4, name: 'Mocha', price: 40.50, orders: 100, image: '🍫' },
-    { id: 5, name: 'Americano', price: 40.50, orders: 100, image: '☕' }
-  ];
+ const [salesData, setSalesData] = useState([]);
+  const [stats, setStats] = useState({
+    totalOrder: { value: 0, change: 0, isPositive: true },
+    newCustomer: { value: 0, change: 0, isPositive: true },
+    totalSales: { value: 0, change: 0, isPositive: true },
+    todaySales: { value: 0, change: 0, isPositive: true },
+    monthlySales: { value: 0, change: 0, isPositive: true },
+    totalCustomers: { value: 0, change: 0, isPositive: true }
+  });
 
-  const recentOrders = [
-    {
-      id: '01',
-      item: 'Cappuccino',
-      orderCode: '#254215',
-      date: '27 Oct 2023, 01:05 PM',
-      table: 28,
-      price: 200,
-      payment: 'Cash',
-      status: 'completed'
-    },
-    {
-      id: '02',
-      item: 'Americano',
-      orderCode: '#254216',
-      date: '28 Oct 2023, 10:25 PM',
-      table: 88,
-      price: 80,
-      payment: 'Card',
-      status: 'preparing'
-    },
-    {
-      id: '03',
-      item: 'Latte',
-      orderCode: '#254217',
-      date: '28 Oct 2023, 11:15 AM',
-      table: 12,
-      price: 150,
-      payment: 'Card',
-      status: 'ready'
-    },
-    {
-      id: '04',
-      item: 'Frappuccino',
-      orderCode: '#254218',
-      date: '28 Oct 2023, 02:30 PM',
-      table: 45,
-      price: 180,
-      payment: 'Cash',
-      status: 'pending'
-    }
-  ];
+  const [trendingCoffee, setTrendingCoffee] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+ const API_BASE_URL = 'http://localhost:5000';
+
 
   // Generate mock sales data for chart
   useEffect(() => {

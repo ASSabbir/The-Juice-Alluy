@@ -8,7 +8,7 @@ const AllProduct = () => {
   useEffect(() => {
     const getCoffees = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/coffees");
+        const res = await axios.get("http://localhost:5000/coffee");
         setCoffees(res.data);
       } catch (error) {
         console.error("Error fetching coffee data:", error);
