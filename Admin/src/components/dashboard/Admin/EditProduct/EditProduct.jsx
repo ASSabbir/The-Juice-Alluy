@@ -108,7 +108,7 @@ const EditProduct = () => {
                 text: "Your product has been updated successfully",
                 icon: "success",
               }).then(() => {
-                navigate("/dashboard/products");
+                navigate("/all_product");
               });
             } else {
               Swal.fire({

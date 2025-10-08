@@ -8,12 +8,14 @@ const MakeOrder = () => {
   const [coffees, setCoffees] = useState([]);
   const [filteredCoffees, setFilteredCoffees] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState([]);
- const [customerInfo, setCustomerInfo] = useState({
+  const [selecteditems, setSelecteditems] = useState([]);
+  const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phone: "",
-    address: "",
   });
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [manualDiscount, setManualDiscount] = useState(0);
+  const [discountType, setDiscountType] = useState("percentage");
 
   useEffect(() => {
     const getCoffees = async () => {
@@ -41,22 +43,35 @@ const MakeOrder = () => {
 
   // Add product to order
   const addToOrder = (coffee) => {
-    const exists = selectedProducts.find((p) => p._id === coffee._id);
+    const exists = selecteditems.find((p) => p._id === coffee._id);
     if (exists) {
       Swal.fire({
         icon: "warning",
         title: "Product already added!",
+        showConfirmButton: false,
+        timer: 1500,
       });
       return;
     }
-    setSelectedProducts([...selectedProducts, { ...coffee, quantity: 1 }]);
+    setSelecteditems([...selecteditems, { ...coffee, quantity: 1 }]);
+
+    // Show success toast when item is added
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: `${coffee.title} added to order`,
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
   };
 
   // Update quantity
   const updateQuantity = (id, quantity) => {
     if (quantity < 1) return;
-    setSelectedProducts(
-      selectedProducts.map((p) =>
+    setSelecteditems(
+      selecteditems.map((p) =>
         p._id === id ? { ...p, quantity: parseInt(quantity) } : p
       )
     );
@@ -64,23 +79,41 @@ const MakeOrder = () => {
 
   // Remove product
   const removeProduct = (id) => {
-    setSelectedProducts(selectedProducts.filter((p) => p._id !== id));
+    setSelecteditems(selecteditems.filter((p) => p._id !== id));
   };
 
-  // Calculate total
-  const calculateTotal = () => {
-    return selectedProducts.reduce(
+  // Calculate totals
+  const calculateSubtotal = () => {
+    return selecteditems.reduce(
       (total, product) => total + product.price * product.quantity,
       0
     );
   };
 
+  const subtotal = calculateSubtotal();
+  const vat = subtotal * 0.02;
+
+  // Calculate discount from  manual discount
+
+  const manualDiscountAmount = discountType === "percentage"
+    ? (subtotal * manualDiscount / 100)
+    : manualDiscount;
+
+  const totalDiscount =  manualDiscountAmount;
+  const grandTotal = subtotal + vat - totalDiscount;
+
+
+
+
+
+
+
   // Submit order
   const handleSubmitOrder = async () => {
-    if (selectedProducts.length === 0) {
+    if (selecteditems.length === 0) {
       Swal.fire({
         icon: "error",
-        title: "No products selected!",
+        title: "No items selected!",
         text: "Please add at least one product.",
       });
       return;
@@ -95,35 +128,56 @@ const MakeOrder = () => {
       return;
     }
 
-    const orderData = {
-      customer: customerInfo,
-      products: selectedProducts.map((p) => ({
-        productId: p._id,
-        name: p.title,
-        quantity: p.quantity,
-        price: p.price,
-      })),
-      total: calculateTotal(),
-      orderDate: new Date(),
-      status: "pending",
-      orderSource: "manual",
+    // Format items to match Order component structure
+    const orderItems = selecteditems.map((product) => ({
+      id: product._id,
+      name: product.title,
+      image: product.image,
+      price: product.price,
+      quantity: product.quantity,
+      subtotal: product.price * product.quantity,
+    }));
 
+    const orderData = {
+      items: orderItems,
+      subtotal,
+      vat,
+      discount: totalDiscount,
+      manualDiscount: manualDiscountAmount,
+      discountType: manualDiscount > 0 ? discountType : null,
+      grandTotal,
+      paymentMethod,
+      orderSource: "manual",
+      status: "progress",
+      orderDate: new Date().toISOString(),
+      customerName: customerInfo.name,
+      customerUID: null,
+      customerPhoto: null,
+      customerPhone: customerInfo.phone,
     };
 
     try {
-      const res = await axios.post("http://localhost:3000/order", orderData);
+      const res = await axios.post("http://localhost:5000/progress-orders", orderData, {
+        headers: { "Content-Type": "application/json" },
+      });
 
-      if (res.data.acknowledged || res.status === 200) {
+      if (res.data.acknowledged || res.status === 201 || res.status === 200) {
         Swal.fire({
           icon: "success",
           title: "Order Created!",
-          text: "Your order has been saved successfully.",
+          text: "Manual order has been saved successfully.",
         });
 
         // Reset form
-        setSelectedProducts([]);
-        setCustomerInfo({ name: "", phone: "", address: "" });
+        setSelecteditems([]);
+        setCustomerInfo({ name: "", phone: ""});
         setSearchQuery("");
+        setPaymentMethod("cash");
+
+
+
+        setManualDiscount(0);
+        setDiscountType("percentage");
       } else {
         Swal.fire({
           icon: "error",
@@ -136,17 +190,16 @@ const MakeOrder = () => {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to create order.",
+        text: error.response?.data?.error || "Failed to create order.",
       });
     }
   };
 
-
   return (
     <div className="min-h-screen bg-backgrondLight text-white">
       {/* Header */}
-      <div className="bg-backgrondDark  flex w-4/5  p-4 mt-3 mx-auto border-b border-gray-800 text-center">
-        <h1 className="text-3xl font-bold  flex mx-auto ">
+      <div className="bg-backgrondDark flex w-4/5 p-4 mt-3 mx-auto border-b border-gray-800 text-center">
+        <h1 className="text-3xl font-bold flex mx-auto">
           Create Manual Order
         </h1>
       </div>
@@ -157,7 +210,7 @@ const MakeOrder = () => {
           <div className="lg:col-span-2 bg-backgrondDark rounded-lg p-6">
             <div className="mb-6">
               <label className="block text-sm font-medium mb-2">
-                Search Products
+                Search items
               </label>
               <div className="relative">
                 <Search
@@ -192,7 +245,6 @@ const MakeOrder = () => {
                         <h3 className="font-semibold text-lg">
                           {coffee.title}
                         </h3>
-
                         <p className="text-amber-500 font-bold flex items-center">
                           <TbCurrencyTaka className="text-xl" />
                           {coffee.price}
@@ -210,7 +262,7 @@ const MakeOrder = () => {
                 ))
               ) : (
                 <p className="text-center text-gray-400 py-8">
-                  No products found
+                  No items found
                 </p>
               )}
             </div>
@@ -235,7 +287,7 @@ const MakeOrder = () => {
                   onChange={(e) =>
                     setCustomerInfo({ ...customerInfo, name: e.target.value })
                   }
-                  className="w-full bg-backgrondLight placeholder-black text-black  border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
+                  className="w-full bg-backgrondLight placeholder-black text-black border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
                   placeholder="Enter name"
                 />
               </div>
@@ -249,40 +301,39 @@ const MakeOrder = () => {
                   onChange={(e) =>
                     setCustomerInfo({ ...customerInfo, phone: e.target.value })
                   }
-                  className="w-full bg-backgrondLight placeholder-black text-black  border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
+                  className="w-full bg-backgrondLight placeholder-black text-black border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
                   placeholder="Enter phone"
                 />
               </div>
+
+              {/* Payment Method */}
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Address
+                  Payment Method
                 </label>
-                <textarea
-                  value={customerInfo.address}
-                  onChange={(e) =>
-                    setCustomerInfo({
-                      ...customerInfo,
-                      address: e.target.value,
-                    })
-                  }
-                  className="w-full bg-backgrondLight placeholder-black text-black  border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
-                  placeholder="Enter address"
-                  rows="2"
-                />
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-full bg-backgrondLight placeholder-black text-black border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-amber-600"
+                >
+                  <option value="cash">Cash</option>
+                  <option value="card">Card</option>
+                  <option value="bkash">Bkash</option>
+                </select>
               </div>
             </div>
 
-            {/* Selected Products */}
+            {/* Selected items */}
             <div className="border-t border-gray-800 pt-4 mb-4">
               <h3 className="font-semibold mb-3">
-                Products ({selectedProducts.length})
+                Items ({selecteditems.length})
               </h3>
-              <div className="space-y-3 max-h-[250px] overflow-y-auto">
-                {selectedProducts.length > 0 ? (
-                  selectedProducts.map((product) => (
+              <div className="space-y-3 max-h-[200px] overflow-y-auto">
+                {selecteditems.length > 0 ? (
+                  selecteditems.map((product) => (
                     <div
                       key={product._id}
-                      className="bg-backgrondLight placeholder-black text-black  rounded p-3 border border-gray-800"
+                      className="bg-backgrondLight placeholder-black text-black rounded p-3 border border-gray-800"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="font-medium text-sm">{product.title}</h4>
@@ -303,7 +354,7 @@ const MakeOrder = () => {
                             onChange={(e) =>
                               updateQuantity(product._id, e.target.value)
                             }
-                            className="w-16 bg-backgrondLight placeholder-black text-black  border border-gray-700 rounded px-2 py-1 text-sm focus:outline-none focus:border-amber-600"
+                            className="w-16 bg-backgrondLight placeholder-black text-black border border-gray-700 rounded px-2 py-1 text-sm focus:outline-none focus:border-amber-600"
                           />
                         </div>
                         <span className="text-amber-500 font-bold flex items-center">
@@ -315,19 +366,84 @@ const MakeOrder = () => {
                   ))
                 ) : (
                   <p className="text-center text-gray-400 text-sm py-4">
-                    No products added
+                    No items added
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Total */}
+            {/* Manual Discount Section */}
             <div className="border-t border-gray-800 pt-4 mb-4">
-              <div className="flex justify-between items-center text-xl font-bold">
-                <span>Total:</span>
+              <label className="block text-sm font-medium mb-2">
+                Manual Discount (Optional)
+              </label>
+              <div className="flex gap-2 mb-2">
+                <select
+                  value={discountType}
+                  onChange={(e) => setDiscountType(e.target.value)}
+                  className="bg-backgrondLight text-black border border-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-amber-600"
+                >
+                  <option value="percentage">%</option>
+                  <option value="fixed">৳</option>
+                </select>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={manualDiscount}
+                  onChange={(e) => setManualDiscount(parseFloat(e.target.value) || 0)}
+                  placeholder={discountType === "percentage" ? "Enter %" : "Enter amount"}
+                  className="flex-grow bg-backgrondLight text-black border border-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-amber-600"
+                />
+              </div>
+              {manualDiscount > 0 && (
+                <p className="text-amber-400 text-xs">
+                  Discount: ৳{manualDiscountAmount.toFixed(2)}
+                  {discountType === "percentage" && ` (${manualDiscount}%)`}
+                </p>
+              )}
+            </div>
+
+            {/* Price Breakdown */}
+            <div className="border-t border-gray-800 pt-4 mb-4 space-y-2">
+              <div className="flex justify-between text-sm text-gray-300">
+                <span>Subtotal:</span>
+                <span className="flex items-center">
+                  <TbCurrencyTaka className="text-lg" />
+                  {subtotal.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-300">
+                <span>VAT (2%):</span>
+                <span className="flex items-center">
+                  <TbCurrencyTaka className="text-lg" />
+                  {vat.toFixed(2)}
+                </span>
+              </div>
+
+              {manualDiscountAmount > 0 && (
+                <div className="flex justify-between text-sm text-green-400">
+                  <span>Manual Discount:</span>
+                  <span className="flex items-center">
+                    - <TbCurrencyTaka className="text-lg" />
+                    {manualDiscountAmount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {totalDiscount > 0 && (
+                <div className="flex justify-between text-sm font-semibold text-green-500 border-t border-gray-700 pt-2">
+                  <span>Total Discount:</span>
+                  <span className="flex items-center">
+                    - <TbCurrencyTaka className="text-lg" />
+                    {totalDiscount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center text-xl font-bold border-t border-gray-700 pt-2">
+                <span>Grand Total:</span>
                 <span className="text-white flex items-center">
-                  <TbCurrencyTaka className="text-xl" />
-                  {calculateTotal().toFixed(2)}
+                  <TbCurrencyTaka className="text-2xl" />
+                  {grandTotal.toFixed(2)}
                 </span>
               </div>
             </div>
