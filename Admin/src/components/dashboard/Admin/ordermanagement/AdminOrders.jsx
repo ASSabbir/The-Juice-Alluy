@@ -56,10 +56,10 @@ const AdminOrders = () => {
 
   // Helper function to determine which collection an order belongs to
   const getOrderCollection = (order) => {
-    if (orders.pending.some(o => o._id === order._id)) return "pending";
-    if (orders.progress.some(o => o._id === order._id)) return "progress";
-    if (orders.completed.some(o => o._id === order._id)) return "completed";
-    if (orders.rejected.some(o => o._id === order._id)) return "rejected";
+    if (orders.pending.some((o) => o._id === order._id)) return "pending";
+    if (orders.progress.some((o) => o._id === order._id)) return "progress";
+    if (orders.completed.some((o) => o._id === order._id)) return "completed";
+    if (orders.rejected.some((o) => o._id === order._id)) return "rejected";
     return order.status || "pending"; // Fallback to status field
   };
 
@@ -81,7 +81,7 @@ const AdminOrders = () => {
           title: "Status Updated!",
           text: `Order moved to ${newStatus}`,
           timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         await fetchOrders();
       }
@@ -90,7 +90,10 @@ const AdminOrders = () => {
       Swal.fire({
         icon: "error",
         title: "Failed",
-        text: error.response?.data?.details || error.response?.data?.error || "Could not update order status",
+        text:
+          error.response?.data?.details ||
+          error.response?.data?.error ||
+          "Could not update order status",
       });
     }
   };
@@ -154,7 +157,9 @@ const AdminOrders = () => {
       ...orders.rejected,
     ];
 
-    return allOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+    return allOrders.sort(
+      (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+    );
   };
 
   const getFilteredOrders = () => {
@@ -172,7 +177,9 @@ const AdminOrders = () => {
       filtered = [...orders.rejected];
     }
 
-    return filtered.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+    return filtered.sort(
+      (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+    );
   };
 
   const tabs = [
@@ -187,7 +194,7 @@ const AdminOrders = () => {
     const currentCollection = getOrderCollection(order);
     const colors = {
       pending: "bg-yellow-500/20 text-yellow-500 border-yellow-500",
-      progress: "bg-blue-500/20 text-blue-500 border-blue-500",
+      progress: "bg-blue-500/50 text-white border-blue-500",
       completed: "bg-green-500/20 text-green-500 border-green-500",
       rejected: "bg-red-500/20 text-red-500 border-red-500",
     };
@@ -201,7 +208,7 @@ const AdminOrders = () => {
   };
 
   const isManualOrder = (order) => {
-    return order.isManual === true || order.orderType === "manual";
+    return order.isManual === true || order.orderSource === "manual";
   };
 
   return (
@@ -252,13 +259,13 @@ const AdminOrders = () => {
                     <div>
                       <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
                         Order #{order._id?.slice(-6).toUpperCase()}
-                        {isManualOrder(order) && (
-                          <span className="text-xs bg-purple-500/20 text-purple-500 border border-purple-500 px-2 py-1 rounded-full">
-                            MANUAL
-                          </span>
-                        )}
+                        <span className="text-xs bg-darkCoffee/20 text-yellow-300 font-bold border border-yellow-500 px-2 py-1 rounded-full">
+                          
+                            {isManualOrder(order) ? "MANUAL" : "Online"}
+
+                        </span>
                       </h3>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-base text-gray-100">
                         {new Date(order.orderDate).toLocaleString()}
                       </p>
                     </div>
@@ -272,7 +279,9 @@ const AdminOrders = () => {
                       </div>
                       <div>
                         <p className="text-xs text-gray-400">Customer</p>
-                        <p className="font-semibold">{order.customerName || "N/A"}</p>
+                        <p className="font-semibold">
+                          {order.customerName || "N/A"}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -281,7 +290,9 @@ const AdminOrders = () => {
                       </div>
                       <div>
                         <p className="text-xs text-gray-400">Phone</p>
-                        <p className="font-semibold">{order.customerPhone || "N/A"}</p>
+                        <p className="font-semibold">
+                          {order.customerPhone || "N/A"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -311,13 +322,16 @@ const AdminOrders = () => {
                           <div className="flex-1">
                             <h5 className="font-semibold">{item.name}</h5>
                             <p className="text-sm text-gray-400">
-                              Qty: {item.quantity} × <TbCurrencyTaka className="inline text-lg" />{item.price}
+                              Qty: {item.quantity} ×{" "}
+                              <TbCurrencyTaka className="inline text-lg" />
+                              {item.price}
                             </p>
                           </div>
                           <div className="text-right">
                             <p className="font-bold text-amber-600 flex items-center">
                               <TbCurrencyTaka className="text-xl" />
-                              {item.subtotal?.toFixed(2) || (item.price * item.quantity).toFixed(2)}
+                              {item.subtotal?.toFixed(2) ||
+                                (item.price * item.quantity).toFixed(2)}
                             </p>
                           </div>
                         </div>
@@ -367,7 +381,8 @@ const AdminOrders = () => {
                   <div className="flex gap-3">
                     {isManualOrder(order) ? (
                       <>
-                        {(currentCollection === "pending" || currentCollection === "progress") && (
+                        {(currentCollection === "pending" ||
+                          currentCollection === "progress") && (
                           <>
                             <button
                               onClick={() => handleCompleteOrder(order)}

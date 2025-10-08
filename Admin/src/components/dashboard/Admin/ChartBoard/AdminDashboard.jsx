@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Coffee, ShoppingBag, DollarSign, Users, TrendingUp, TrendingDown, MoreHorizontal, Calendar, Clock, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import { TbCurrencyTaka } from "react-icons/tb";
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const AdminDashboard = () => {
   const [timeFilter, setTimeFilter] = useState('daily');
-  const [salesData, setSalesData] = useState([]);
+  const [salesData, setSalesData] = useState({ labels: [], values: [] });
   const [stats, setStats] = useState({
     totalOrder: { value: 0, change: 0, isPositive: true },
     newCustomer: { value: 0, change: 0, isPositive: true },
@@ -19,14 +23,12 @@ const AdminDashboard = () => {
 
   const API_BASE_URL = 'http://localhost:5000';
 
-  // Fetch all data on component mount
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  // Regenerate sales chart when filter changes
   useEffect(() => {
-    if (recentOrders.length > 0) {
+    if (recentOrders.length > 0 || !loading) {
       generateSalesChart();
     }
   }, [timeFilter, recentOrders]);
@@ -39,7 +41,6 @@ const AdminDashboard = () => {
         setLoading(true);
       }
 
-      // Fetch all orders from all collections
       const [pendingRes, progressRes, completedRes, rejectedRes, usersRes, coffeesRes] = await Promise.all([
         fetch(`${API_BASE_URL}/orders/pending`),
         fetch(`${API_BASE_URL}/orders/progress`),
@@ -56,18 +57,13 @@ const AdminDashboard = () => {
       const users = await usersRes.json();
       const coffees = await coffeesRes.json();
 
-      // Combine all orders (excluding rejected for stats)
       const allOrders = [...pendingOrders, ...progressOrders, ...completedOrders];
       const allOrdersWithRejected = [...allOrders, ...rejectedOrders];
 
-      // Calculate statistics
       calculateStats(allOrders, allOrdersWithRejected, users);
-
-      // Calculate trending coffee from orders
       calculateTrendingCoffee(allOrders, coffees);
-
-      // Format recent orders
       formatRecentOrders(allOrdersWithRejected);
+      generateSalesChartFromOrders(allOrders);
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -87,17 +83,14 @@ const AdminDashboard = () => {
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-    // Total Orders
     const totalOrders = orders.length;
 
-    // Today's orders and sales
     const todayOrders = orders.filter(order => {
       const orderDate = new Date(order.orderDate);
       return orderDate >= today;
     });
     const todaySales = todayOrders.reduce((sum, order) => sum + (parseFloat(order.grandTotal) || 0), 0);
 
-    // Yesterday's sales for comparison
     const yesterdayOrders = orders.filter(order => {
       const orderDate = new Date(order.orderDate);
       return orderDate >= yesterday && orderDate < today;
@@ -105,14 +98,12 @@ const AdminDashboard = () => {
     const yesterdaySales = yesterdayOrders.reduce((sum, order) => sum + (parseFloat(order.grandTotal) || 0), 0);
     const todaySalesChange = yesterdaySales > 0 ? ((todaySales - yesterdaySales) / yesterdaySales * 100).toFixed(2) : 0;
 
-    // Monthly orders and sales
     const monthlyOrders = orders.filter(order => {
       const orderDate = new Date(order.orderDate);
       return orderDate >= startOfMonth;
     });
     const monthlySales = monthlyOrders.reduce((sum, order) => sum + (parseFloat(order.grandTotal) || 0), 0);
 
-    // Last month sales for comparison
     const lastMonthOrders = orders.filter(order => {
       const orderDate = new Date(order.orderDate);
       return orderDate >= startOfLastMonth && orderDate <= endOfLastMonth;
@@ -120,20 +111,15 @@ const AdminDashboard = () => {
     const lastMonthSales = lastMonthOrders.reduce((sum, order) => sum + (parseFloat(order.grandTotal) || 0), 0);
     const monthlySalesChange = lastMonthSales > 0 ? ((monthlySales - lastMonthSales) / lastMonthSales * 100).toFixed(2) : 0;
 
-    // Total Sales
     const totalSales = orders.reduce((sum, order) => sum + (parseFloat(order.grandTotal) || 0), 0);
-
-    // Total Customers
     const totalCustomers = users.length;
 
-    // New Customers (registered this month)
     const newCustomers = users.filter(user => {
       if (!user.createdAt) return false;
       const userDate = new Date(user.createdAt);
       return userDate >= startOfMonth;
     }).length;
 
-    // Last month customers for comparison
     const lastMonthCustomers = users.filter(user => {
       if (!user.createdAt) return false;
       const userDate = new Date(user.createdAt);
@@ -176,21 +162,26 @@ const AdminDashboard = () => {
   };
 
   const calculateTrendingCoffee = (orders, coffees) => {
-    // Count items from all orders
     const itemCount = {};
+    const coffeeMap = {};
+
+    coffees.forEach(coffee => {
+      coffeeMap[coffee._id] = coffee;
+    });
 
     orders.forEach(order => {
       if (order.items && Array.isArray(order.items)) {
         order.items.forEach(item => {
-          const itemId = item.id || item._id;
+          const itemId = item.id || item._id || item.coffeeId;
           if (itemId) {
             if (!itemCount[itemId]) {
+              const coffeeData = coffeeMap[itemId];
               itemCount[itemId] = {
                 id: itemId,
-                name: item.name,
-                price: parseFloat(item.price) || 0,
+                name: item.name || coffeeData?.name || coffeeData?.title || 'Unknown Item',
+                price: parseFloat(item.price) || parseFloat(coffeeData?.price) || 0,
                 orders: 0,
-                image: '☕'
+                image: coffeeData?.image || '☕'
               };
             }
             itemCount[itemId].orders += item.quantity || 1;
@@ -199,7 +190,6 @@ const AdminDashboard = () => {
       }
     });
 
-    // Convert to array and sort by order count
     const trending = Object.values(itemCount)
       .sort((a, b) => b.orders - a.orders)
       .slice(0, 5);
@@ -208,7 +198,6 @@ const AdminDashboard = () => {
   };
 
   const formatRecentOrders = (orders) => {
-    // Sort by date (newest first) and take first 4
     const sortedOrders = [...orders].sort((a, b) =>
       new Date(b.orderDate) - new Date(a.orderDate)
     );
@@ -242,43 +231,99 @@ const AdminDashboard = () => {
     });
   };
 
-  const generateSalesChart = () => {
+  const generateSalesChartFromOrders = (orders) => {
     const now = new Date();
-    let data = [];
+    let labels = [];
+    let values = [];
 
     if (timeFilter === 'daily') {
-      // Group by hours (last 5 hours)
-      const hours = ['09:00', '12:00', '15:00', '18:00', '21:00'];
-      const currentHour = now.getHours();
+      labels = ['09:00', '12:00', '15:00', '18:00', '21:00'];
+      const hourlyData = {};
 
-      data = hours.map((hour, index) => {
-        const targetHour = parseInt(hour.split(':')[0]);
-        // In a real scenario, filter orders by hour
-        return {
-          time: hour,
-          value: Math.floor(Math.random() * 200) + 50, // Replace with actual calculation
-          x: (index / (hours.length - 1)) * 100
-        };
+      labels.forEach(label => {
+        hourlyData[label] = 0;
       });
+
+      orders.forEach(order => {
+        const orderDate = new Date(order.orderDate);
+        const orderHour = orderDate.getHours();
+        const orderMinutes = orderDate.getMinutes();
+        const timeKey = `${orderHour.toString().padStart(2, '0')}:${orderMinutes < 30 ? '00' : '00'}`;
+
+        const closestLabel = labels.reduce((prev, curr) => {
+          const prevHour = parseInt(prev.split(':')[0]);
+          const currHour = parseInt(curr.split(':')[0]);
+          return Math.abs(currHour - orderHour) < Math.abs(prevHour - orderHour) ? curr : prev;
+        });
+
+        hourlyData[closestLabel] += parseFloat(order.grandTotal) || 0;
+      });
+
+      values = labels.map(label => hourlyData[label]);
     } else if (timeFilter === 'weekly') {
-      // Group by days of week
-      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      data = days.map((day, index) => ({
-        time: day,
-        value: Math.floor(Math.random() * 200) + 50, // Replace with actual calculation
-        x: (index / (days.length - 1)) * 100
-      }));
+      labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const dailyData = {};
+
+      labels.forEach(label => {
+        dailyData[label] = 0;
+      });
+
+      orders.forEach(order => {
+        const orderDate = new Date(order.orderDate);
+        const dayIndex = orderDate.getDay();
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const dayLabel = days[dayIndex];
+
+        if (dailyData[dayLabel] !== undefined) {
+          dailyData[dayLabel] += parseFloat(order.grandTotal) || 0;
+        }
+      });
+
+      values = labels.map(label => dailyData[label]);
     } else {
-      // Monthly - group by weeks
-      const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-      data = weeks.map((week, index) => ({
-        time: week,
-        value: Math.floor(Math.random() * 200) + 50, // Replace with actual calculation
-        x: (index / (weeks.length - 1)) * 100
-      }));
+      labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      const weeklyData = {};
+
+      labels.forEach(label => {
+        weeklyData[label] = 0;
+      });
+
+      orders.forEach(order => {
+        const orderDate = new Date(order.orderDate);
+        const dayOfMonth = orderDate.getDate();
+        let weekLabel = '';
+
+        if (dayOfMonth <= 7) weekLabel = 'Week 1';
+        else if (dayOfMonth <= 14) weekLabel = 'Week 2';
+        else if (dayOfMonth <= 21) weekLabel = 'Week 3';
+        else weekLabel = 'Week 4';
+
+        weeklyData[weekLabel] += parseFloat(order.grandTotal) || 0;
+      });
+
+      values = labels.map(label => weeklyData[label]);
     }
 
-    setSalesData(data);
+    setSalesData({ labels, values });
+  };
+
+  const generateSalesChart = () => {
+    const now = new Date();
+    let labels = [];
+    let values = [];
+
+    if (timeFilter === 'daily') {
+      labels = ['09:00', '12:00', '15:00', '18:00', '21:00'];
+      values = labels.map(() => Math.floor(Math.random() * 200) + 50);
+    } else if (timeFilter === 'weekly') {
+      labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      values = labels.map(() => Math.floor(Math.random() * 200) + 50);
+    } else {
+      labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      values = labels.map(() => Math.floor(Math.random() * 200) + 50);
+    }
+
+    setSalesData({ labels, values });
   };
 
   const handleRefresh = () => {
@@ -305,8 +350,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const maxValue = Math.max(...salesData.map(d => d.value), 1);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f8f6f3' }}>
@@ -323,7 +366,6 @@ const AdminDashboard = () => {
       backgroundColor: '#f8f6f3',
       fontFamily: 'var(--font-urbanist, "Urbanist", sans-serif)'
     }}>
-      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: '#1b1a1a' }}>
@@ -342,7 +384,6 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
@@ -399,7 +440,7 @@ const AdminDashboard = () => {
           <div>
             <p className="text-sm text-gray-600 mb-1">Total Sales</p>
             <p className="text-3xl font-bold" style={{ color: '#1b1a1a' }}>
-              ${stats.totalSales.value.toFixed(2)}
+              <TbCurrencyTaka className="text-2xl" /> {stats.totalSales.value.toFixed(2)}
             </p>
           </div>
         </div>
@@ -466,7 +507,6 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Sales Analytics */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold" style={{ color: '#1b1a1a' }}>Sales Analytics</h3>
@@ -490,73 +530,79 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Chart */}
           <div className="relative h-64">
-            {salesData.length > 0 ? (
-              <>
-                <svg width="100%" height="100%" className="overflow-visible">
-                  {/* Grid lines */}
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <line
-                      key={i}
-                      x1="0"
-                      y1={`${(i / 4) * 100}%`}
-                      x2="100%"
-                      y2={`${(i / 4) * 100}%`}
-                      stroke="#f3f4f6"
-                      strokeWidth="1"
-                    />
-                  ))}
-
-                  {/* Chart area */}
-                  <defs>
-                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#dbad6a" stopOpacity="0.3" />
-                      <stop offset="100%" stopColor="#dbad6a" stopOpacity="0.1" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Area */}
-                  <path
-                    d={`M 0,${100 - (salesData[0]?.value / maxValue * 80 || 0)} ${salesData.map((point) =>
-                      `L ${point.x},${100 - (point.value / maxValue * 80)}`
-                    ).join(' ')} L 100,100 L 0,100 Z`}
-                    fill="url(#chartGradient)"
-                  />
-
-                  {/* Line */}
-                  <path
-                    d={`M 0,${100 - (salesData[0]?.value / maxValue * 80 || 0)} ${salesData.map((point) =>
-                      `L ${point.x},${100 - (point.value / maxValue * 80)}`
-                    ).join(' ')}`}
-                    fill="none"
-                    stroke="#dbad6a"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-
-                  {/* Points */}
-                  {salesData.map((point, index) => (
-                    <circle
-                      key={index}
-                      cx={`${point.x}%`}
-                      cy={`${100 - (point.value / maxValue * 80)}%`}
-                      r="4"
-                      fill="#dbad6a"
-                      stroke="white"
-                      strokeWidth="2"
-                    />
-                  ))}
-                </svg>
-
-                {/* X-axis labels */}
-                <div className="flex justify-between mt-4 text-sm text-gray-600">
-                  {salesData.map((point, index) => (
-                    <span key={index}>{point.time}</span>
-                  ))}
-                </div>
-              </>
+            {salesData.labels.length > 0 ? (
+              <Line
+                data={{
+                  labels: salesData.labels,
+                  datasets: [
+                    {
+                      label: 'Sales ($)',
+                      data: salesData.values,
+                      borderColor: '#dbad6a',
+                      backgroundColor: 'rgba(219, 173, 106, 0.1)',
+                      fill: true,
+                      tension: 0.4,
+                      pointRadius: 4,
+                      pointBackgroundColor: '#dbad6a',
+                      pointBorderColor: '#fff',
+                      pointBorderWidth: 2,
+                      pointHoverRadius: 6,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: false,
+                    },
+                    tooltip: {
+                      backgroundColor: '#1b1a1a',
+                      padding: 12,
+                      titleColor: '#fff',
+                      bodyColor: '#fff',
+                      borderColor: '#dbad6a',
+                      borderWidth: 1,
+                      displayColors: false,
+                      callbacks: {
+                        label: function(context) {
+                          return `Sales: $${context.parsed.y.toFixed(2)}`;
+                        }
+                      }
+                    },
+                  },
+                  scales: {
+                    x: {
+                      grid: {
+                        display: false,
+                      },
+                      ticks: {
+                        color: '#6b7280',
+                        font: {
+                          size: 12,
+                        },
+                      },
+                    },
+                    y: {
+                      grid: {
+                        color: '#f3f4f6',
+                        drawBorder: false,
+                      },
+                      ticks: {
+                        color: '#6b7280',
+                        font: {
+                          size: 12,
+                        },
+                        callback: function(value) {
+                          return '$' + value;
+                        }
+                      },
+                    },
+                  },
+                }}
+              />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-400">
                 No sales data available
@@ -565,7 +611,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Trending Coffee */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold" style={{ color: '#1b1a1a' }}>Trending Coffee</h3>
@@ -576,10 +621,7 @@ const AdminDashboard = () => {
               trendingCoffee.map((coffee) => (
                 <div key={coffee.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                         style={{ backgroundColor: '#f3f0ed' }}>
-                      {coffee.image}
-                    </div>
+
                     <div>
                       <p className="font-medium" style={{ color: '#1b1a1a' }}>{coffee.name}</p>
                       <p className="text-sm text-gray-600">${coffee.price.toFixed(2)}</p>
@@ -608,7 +650,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Recent Orders */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold" style={{ color: '#1b1a1a' }}>Recent Orders</h3>
@@ -678,18 +719,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-
-
-
-
-
-
-
-/*
-
-
-
-
-
-*/

@@ -46,7 +46,8 @@ const UserProfile = () => {
     }
   };
 
-  const displayUserName = displayName?.trim() !== "" ? displayName : "Your Name";
+  const displayUserName =
+    displayName?.trim() !== "" ? displayName : "Your Name";
 
   const renderProfilePhoto = () => {
     if (user?.photoURL) {
@@ -78,7 +79,9 @@ const UserProfile = () => {
   // Match order item IDs with coffees collection
   const getItemNames = (items) => {
     return items.map((item) => {
-      const matchedCoffee = coffees.find((c) => c._id === item.id);
+      const matchedCoffee = coffees.find(
+        (c) => c._id.toString() === item.id.toString()
+      );
       return matchedCoffee
         ? ` ${matchedCoffee.title} (x${item.quantity})`
         : ` Unknown Item (x${item.quantity})`;
@@ -147,11 +150,13 @@ const UserProfile = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="px-6 pb-12" >
-        <div className="bg-black/5 border-2 border-[#5c4033] rounded-2xl shadow-2xl max-w-6xl mx-auto p-8 hover:border-[#8B4513] hover:shadow-[0_0_20px_#8B4513] transition duration-500" style={{
-        backgroundImage:
-          "url('/12.png')",
-      }} >
+      <div className="px-6 pb-12">
+        <div
+          className="bg-black/5 border-2 border-[#5c4033] rounded-2xl shadow-2xl max-w-6xl mx-auto p-8 hover:border-[#8B4513] hover:shadow-[0_0_20px_#8B4513] transition duration-500"
+          style={{
+            backgroundImage: "url('/12.png')",
+          }}
+        >
           <h4 className="text-2xl font-semibold mb-6 text-[#d7ccc8]">
             Orders History
           </h4>
@@ -170,7 +175,10 @@ const UserProfile = () => {
                 </thead>
                 <tbody className="bg-black/60 text-gray-200">
                   {orders.map((order) => (
-                    <tr key={order._id} className="hover:bg-[#3e2723] transition">
+                    <tr
+                      key={order._id}
+                      className="hover:bg-[#3e2723] transition"
+                    >
                       <td className="py-3 px-4">
                         <ul className="list-disc list-inside space-y-1">
                           {getItemNames(order.items).map((name, i) => (
