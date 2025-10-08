@@ -46,6 +46,7 @@ const Register = () => {
     const password = e.target.password.value;
     const confirm = e.target.confirm.value;
     const photoFile = e.target.photo.files[0];
+    
 
     if (username === "" || email === "" || password === "" || confirm === "" || !photoFile) {
       Toast.fire({ icon: "error", title: "All fields must be filled out." });
@@ -94,7 +95,7 @@ const Register = () => {
               });
 
               // Save user to DB
-              const userDoc = { username, email, photoURL: url };
+              const userDoc = { username, email, photoURL: url,createdAt: new Date() };
               axios
                 .post("http://localhost:5000/users", userDoc)
                 .then((res) => console.log(res.data))
@@ -121,7 +122,7 @@ const Register = () => {
           icon: "success",
           title: `Welcome ${user2.user.displayName}`,
         });
-        const userDoc = { email: user2.user.email, };
+        const userDoc = { email: user2.user.email,createdAt: new Date() };
         axios
           .post("http://localhost:5000/users", userDoc)
           .then((res) => console.log(res.data))
@@ -136,37 +137,27 @@ const Register = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative bg-cover bg-center"
+      className="min-h-screen flex items-center justify-end md:px-[18vw] relative bg-cover bg-center"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1511920170033-f8396924c348')",
+          "url('/11.jpg')",
       }}
     >
       {/* Dark Shadow Overlay */}
       <div className="absolute inset-0 bg-black/50"></div>
 
       {/* Register Card */}
-      <div className="relative w-full max-w-md bg-black/20 backdrop-blur-md rounded-2xl shadow-2xl p-8 z-10 my-32">
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-[#d2a679] drop-shadow-lg">
-          <Typewriter
-            words={["Create Your Coffee Account", "Join the Coffee Lovers Family"]}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={80}
-            deleteSpeed={50}
-            delaySpeed={2000}
-          />
+      <div className="relative w-full max-w-160 bg-black/20 backdrop-blur-md  shadow-2xl p-8 z-10 my-32">
+        <h2 className="text-3xl font- text-center mb-6 text-white drop-shadow-lg">
+          Sign Up
         </h2>
-        <p className="text-gray-400 text-center mb-8 italic">
-          "Every sip begins with a story — let's start yours today."
-        </p>
 
-        <form onSubmit={handleFormSubmit} className="space-y-6">
+
+        <form onSubmit={handleFormSubmit} className="grid-cols-2 grid mt-15 gap-12 ">
           {/* Name */}
           <div>
-            <label className="block text-gray-300 mb-2">Full Name</label>
-            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
+
+            <div className="flex items-center  border-b border-[#333]  px-4">
               <FaUser className="text-[#d2a679] mr-3" />
               <input
                 type="text"
@@ -179,8 +170,8 @@ const Register = () => {
 
           {/* Email */}
           <div>
-            <label className="block text-gray-300 mb-2">Email Address</label>
-            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
+
+            <div className="flex items-center border-b border-[#333]  px-4">
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
                 type="email"
@@ -193,8 +184,8 @@ const Register = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-gray-300 mb-2">Password</label>
-            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
+
+            <div className="flex items-center border-b border-[#333]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showPassword ? "text" : "password"}
@@ -214,8 +205,8 @@ const Register = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-gray-300 mb-2">Confirm Password</label>
-            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
+
+            <div className="flex items-center border-b border-[#333]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showConfirm ? "text" : "password"}
@@ -235,11 +226,12 @@ const Register = () => {
 
           {/* Upload Photo */}
           <div>
-            <label className="block text-gray-300 mb-2">Upload Photo</label>
-            <div className="flex items-center bg-[#0f0f0f]/80 border border-[#333] rounded-xl px-4">
+
+            <div className="flex items-center border-b border-[#333]  px-4">
               <FaImage className="text-[#d2a679] mr-3" />
               <input
                 type="file"
+
                 name="photo"
                 className="w-full py-3 text-gray-300 bg-transparent focus:outline-none"
               />
@@ -250,16 +242,16 @@ const Register = () => {
           {flag ? (
             <button
               disabled
-              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg bg-gray-600"
+              className="w-full py-3 mt-4  font-bold text-black text-lg bg-gray-600"
             >
               <span className="loading loading-bars loading-sm"></span>
             </button>
           ) : (
             <button
               type="submit"
-              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg
+              className="w-full  h-10   font-bold text-black text-lg
                        bg-gradient-to-r from-[#d2a679] to-[#b58855]
-                       shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50
+                       shadow-md
                        transition duration-300"
             >
               Register
@@ -268,7 +260,7 @@ const Register = () => {
         </form>
 
         {/* Google */}
-        <div className="flex items-center pt-4 space-x-1">
+        <div className="flex items-center pt-9 space-x-1">
           <div className="flex-1 h-px bg-gray-500"></div>
           <p className="px-3 text-sm text-gray-400">Or sign up with</p>
           <div className="flex-1 h-px bg-gray-500"></div>

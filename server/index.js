@@ -26,8 +26,21 @@ async function run() {
     const cartCollections = database.collection("carts");
     const orderCollections = database.collection("orders");
     const pendingOrderCollections = database.collection("pendingOrders");
+    const usersCollection = database.collection("users");
     const progressOrderCollections = database.collection("progressOrders");
+    const juiceCollection = database.collection("juice");
+    const rejectedOrderCollections = database.collection("rejectedOrders");
 
+    // get all juice items
+    app.get('/juice', async (req, res) => {
+      try {
+        const juices = await juiceCollection.find().toArray();
+        res.send(juices);
+      } catch (error) {
+        console.error("Error fetching juice items:", error);
+        res.status(500).send({ message: "Failed to fetch juice items", error });
+      }
+    });
 
 
     //Get all coffees
@@ -38,7 +51,6 @@ async function run() {
 
 
     // Products add and get api
-
     app.post('/coffee', async (req, res) => {
       const data = req.body
       console.log(data)
@@ -46,20 +58,37 @@ async function run() {
       res.send(result)
     })
 
-
+    // Get all coffees
+    app.get("/coffees", async (req, res) => {
+      try {
+        const coffees = await coffeesCollections.find().toArray();
+        res.send(coffees);
+      } catch (error) {
+        console.error("Error fetching coffees:", error);
+        res.status(500).send({ message: "Failed to fetch coffees" });
+      }
+    });
 
 
     //Get single coffee by ID
     app.get('/coffee/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const coffee = await coffeesCollections.findOne(query);
-      res.send(coffee);
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const coffee = await coffeesCollections.findOne(query);
+        if (!coffee) {
+          return res.status(404).send({ message: 'Coffee not found' });
+        }
+        res.send(coffee);
+      } catch (error) {
+        console.error('Error fetching coffee:', error);
+        res.status(500).send({ message: 'Internal server error' });
+      }
     });
 
     //Get all users
     app.get('/users', async (req, res) => {
-      const result = await usersCollections.find().toArray();
+      const result = await usersCollection.find().toArray();
       res.send(result);
     });
 
@@ -68,31 +97,36 @@ async function run() {
     app.post('/users', async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
-      const existingUser = await usersCollections.findOne(query);
+      const existingUser = await usersCollection.findOne(query);
       if (existingUser) {
         return res.send({ message: 'user already here' });
       }
-      const result = await usersCollections.insertOne(user);
+      const result = await usersCollection.insertOne(user);
       res.send(result);
     });
 
-    // Update user by email
-    app.put('/users/:email', async (req, res) => {
-      const email = req.params.email;
-      const updatedUser = req.body;
-      const filter = { email: email };
-      const updateDoc = {
-        $set: {
-          displayName: updatedUser.displayName,
-          photoURL: updatedUser.photoURL,
-          role: updatedUser.role,
-        },
-      };
-      const result = await usersCollections.updateOne(filter, updateDoc, {
-        upsert: true,
-      });
-      res.send(result);
+    // Update user's display name
+    app.put("/users/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const { displayName } = req.body;
+
+        const result = await usersCollection.updateOne(
+          { email },
+          { $set: { displayName } }
+        );
+
+        res.send({
+          success: true,
+          message: "Name updated successfully",
+          result,
+        });
+      } catch (error) {
+        console.error("Error updating name:", error);
+        res.status(500).send({ error: "Failed to update name" });
+      }
     });
+
 
 
     // Add item to cart
@@ -156,27 +190,86 @@ async function run() {
     });
 
 
+    // Add new pending order
+    app.post("/pending-orders", async (req, res) => {
+      try {
+        console.log("Incoming Pending Order:", req.body);
 
+        const order = req.body;
 
+        if (!order || !order.items || order.items.length === 0) {
+          return res.status(400).send({ error: "Order data is invalid" });
+        }
 
+        const result = await pendingOrderCollections.insertOne(order);
+        res.status(201).send({
+          success: true,
+          message: "Pending order placed successfully",
+          orderId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Error creating pending order:", error);
+        res.status(500).send({ error: "Failed to create pending order" });
+      }
+    });
+    // Add new pending order
+    app.post("/progress-orders", async (req, res) => {
+      try {
+        console.log("Incoming Progress Order:", req.body);
 
+        const order = req.body;
 
+        if (!order || !order.items || order.items.length === 0) {
+          return res.status(400).send({ error: "Order data is invalid" });
+        }
 
-    /*
+        const result = await progressOrderCollections.insertOne(order);
+        res.status(201).send({
+          success: true,
+          message: "Pending order placed successfully",
+          orderId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Error creating pending order:", error);
+        res.status(500).send({ error: "Failed to create pending order" });
+      }
+    });
 
+    // Get user orders by email (searches across all collections)
+    app.get('/user/orders/:email', async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { customerEmail: email };
 
-// -------------------!Important-------------------
+        // Search all three collections
+        const [pendingOrders, progressOrders, completedOrders] = await Promise.all([
+          pendingOrderCollections.find(query).toArray(),
+          progressOrderCollections.find(query).toArray(),
+          rejectedOrderCollections.find(query).toArray(),
+          orderCollections.find(query).toArray()
+        ]);
 
+        // Combine all orders
+        const allUserOrders = [
+          ...pendingOrders,
+          ...progressOrders,
+          ...completedOrders
+        ];
 
+        // Sort by date (newest first)
+        allUserOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
 
-
+        res.send(allUserOrders);
+      } catch (error) {
+        console.error("Error fetching user orders:", error);
+        res.status(500).json({ error: "Failed to fetch user orders" });
+      }
+    });
 
 
     //Add new order
     app.post("/orders", async (req, res) => {
       try {
-        console.log("Incoming Order:", req.body);
-
         const order = req.body;
 
         if (!order || !order.items || order.items.length === 0) {
@@ -193,12 +286,7 @@ async function run() {
         console.error("Error creating order:", error);
         res.status(500).send({ error: "Failed to create order" });
       }
-    });
-
-    */
-
-
-
+    })
 
 
     app.get("/best_products", async (req, res) => {
@@ -209,10 +297,6 @@ async function run() {
 
 
     // -------------------Admin Routes-------------------
-
-
-
-
 
     //create orders
     app.post('/order', async (req, res) => {
@@ -227,18 +311,13 @@ async function run() {
     });
 
 
-
-
-
     // get orders
     app.get('/orders', async (req, res) => {
       try {
         const orders = await orderCollections.find().toArray();
         res.send(orders);
-
       } catch (error) {
         console.error("Error fetching orders:", error);
-
       }
     })
 
@@ -262,7 +341,6 @@ async function run() {
     // delete coffee
     app.delete('/coffees/:id', async (req, res) => {
       try {
-
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
         const result = await coffeesCollections.deleteOne(query);
@@ -274,57 +352,101 @@ async function run() {
     });
 
 
-
     // -------------------Experimental Routes-------------------
-
-
-    app.post('/orders', async (req, res) => {
-      try {
-        const orderData = req.body;
-        const result = await pendingOrderCollections.insertOne(orderData);
-        res.status(201).json({
-          message: "Order placed successfully",
-          orderId: result.insertedId
-        });
-      } catch (error) {
-        res.status(500).json({ error: "Failed to place order" });
-      }
-    });
 
     // Update order status (moves between collections)
     app.patch('/orders/:id/status', async (req, res) => {
       try {
         const id = req.params.id;
         const { status, currentCollection } = req.body;
+
+        // Validate ObjectId
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({ error: "Invalid order ID" });
+        }
+
         const query = { _id: new ObjectId(id) };
 
-        // Determine source collection
+        // Determine source collection based on currentCollection parameter
         let sourceCollection;
-        if (currentCollection === "pending") sourceCollection = pendingOrderCollections;
-        else if (currentCollection === "progress") sourceCollection = progressOrderCollections;
-        else sourceCollection = orderCollections;
+        switch (currentCollection) {
+          case "pending":
+            sourceCollection = pendingOrderCollections;
+            break;
+          case "progress":
+            sourceCollection = progressOrderCollections;
+            break;
+          case "rejected":
+            sourceCollection = rejectedOrderCollections;
+            break;
+          case "completed":
+            sourceCollection = orderCollections;
+            break;
+          default:
+            return res.status(400).json({ error: "Invalid current collection" });
+        }
 
         // Get order from source
         const order = await sourceCollection.findOne(query);
-        if (!order) return res.status(404).json({ error: "Order not found" });
+        if (!order) {
+          return res.status(404).json({
+            error: "Order not found",
+            details: `No order found with ID ${id} in ${currentCollection} collection`
+          });
+        }
 
-        // Update status
+        // Update status and timestamp
         order.status = status;
         order.updatedAt = new Date().toISOString();
 
-        // Determine destination collection
+        // Determine destination collection based on new status
         let destinationCollection;
-        if (status === "progress") destinationCollection = progressOrderCollections;
-        else if (status === "completed") destinationCollection = orderCollections;
-        else destinationCollection = pendingOrderCollections;
+        switch (status) {
+          case "pending":
+            destinationCollection = pendingOrderCollections;
+            break;
+          case "progress":
+            destinationCollection = progressOrderCollections;
+            break;
+          case "completed":
+            destinationCollection = orderCollections;
+            break;
+          case "rejected":
+            destinationCollection = rejectedOrderCollections;
+            break;
+          default:
+            return res.status(400).json({ error: "Invalid status" });
+        }
 
-        // Move to destination
-        await destinationCollection.insertOne(order);
-        await sourceCollection.deleteOne(query);
+        // If source and destination are the same, just update
+        if (sourceCollection === destinationCollection) {
+          await sourceCollection.updateOne(query, {
+            $set: {
+              status: status,
+              updatedAt: order.updatedAt
+            }
+          });
+        } else {
+          // Move to destination collection
+          await destinationCollection.insertOne(order);
+          await sourceCollection.deleteOne(query);
+        }
 
-        res.send({ message: "Order status updated successfully" });
+        res.json({
+          success: true,
+          message: "Order status updated successfully",
+          order: {
+            _id: order._id,
+            status: order.status,
+            updatedAt: order.updatedAt
+          }
+        });
       } catch (error) {
-        res.status(500).json({ error: "Failed to update order status" });
+        console.error("Error updating order status:", error);
+        res.status(500).json({
+          error: "Failed to update order status",
+          details: error.message
+        });
       }
     });
 
@@ -336,8 +458,9 @@ async function run() {
 
         if (collection === "pending") targetCollection = pendingOrderCollections;
         else if (collection === "progress") targetCollection = progressOrderCollections;
-        else if (collection === "completed") targetCollection = orderCollections; // ✅ Add explicit check
-        else return res.status(400).json({ error: "Invalid collection" }); // ✅ Handle invalid requests
+        else if (collection === "completed") targetCollection = orderCollections;
+        else if (collection === "rejected") targetCollection = rejectedOrderCollections;
+        else return res.status(400).json({ error: "Invalid collection" });
 
         const orders = await targetCollection.find().toArray();
         res.send(orders);
@@ -346,28 +469,16 @@ async function run() {
       }
     });
 
-
-
-
-
-
-
     // ----------------------Experimental Routes End-------------------
-
-
-
     // ----------------------Admin Routes End-------------------
 
-
     console.log("Connected to MongoDB successfully!");
-
-
-
 
   } finally {
     // await client.close(); // keep connection open for server
   }
 }
+
 run().catch(console.dir);
 
 // Root route

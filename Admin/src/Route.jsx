@@ -8,6 +8,7 @@ import Login from "./components/dashboard/Admin/Login/Login";
 import AllProduct from "./components/dashboard/Admin/AllProduct/AllProduct";
 import EditProduct from "./components/dashboard/Admin/EditProduct/EditProduct";
 import OrdersManagement from "./components/dashboard/Admin/ordermanagement/AdminOrders";
+import AdminDashboard from "./components/dashboard/Admin/ChartBoard/AdminDashboard";
 
 export const Route = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const Route = createBrowserRouter([
       {
         path:"/order_management",
         element:<OrdersManagement></OrdersManagement>
+      },
+      {
+        path:"/admin_dashboard",
+        element:<AdminDashboard></AdminDashboard>
       }
     ],
   },

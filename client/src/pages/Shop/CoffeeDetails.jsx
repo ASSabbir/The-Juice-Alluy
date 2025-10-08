@@ -34,52 +34,58 @@ const CoffeeDetails = () => {
     getCoffee();
   }, [id]);
 
-  //Add to Cart Function (with user info)
-  const handleAddToCart = async () => {
-    if (!coffee || !user) {
-      Swal.fire({
-        icon: "warning",
-        title: "Please Login!",
-        text: "You need to login before adding to cart.",
-        confirmButtonColor: "#d2a679",
-      });
-      return;
-    }
+// Add to Cart Function (with user info)
+const handleAddToCart = async () => {
+  if (!coffee || !user) {
+    Swal.fire({
+      icon: "warning",
+      title: "Please Login!",
+      text: "You need to login before adding to cart.",
+      confirmButtonColor: "#d2a679",
+    });
+    return;
+  }
 
-    const cartItem = {
-      coffeeId: coffee._id,
-      title: coffee.title,
-      image: coffee.image,
-      price: coffee.price,
-      category: coffee.category,
-      rating: coffee.rating,
-      date: new Date().toISOString(),
-      userEmail: user.email,
-      userName: user.displayName || "Unknown User",
-      userPhoto: user.photoURL || "/default-avatar.png",
-    };
-
-    try {
-      const res = await axios.post("http://localhost:5000/cart", cartItem);
-      if (res.data.insertedId) {
-        Swal.fire({
-          icon: "success",
-          title: "Added to Cart!",
-          text: `${coffee.title} has been added to your cart.`,
-          background: "#1a1a1a",
-          color: "#d2a679",
-          confirmButtonColor: "#d2a679",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to add item to cart!",
-      });
-    }
+  const cartItem = {
+    coffeeId: coffee._id,
+    title: coffee.title,
+    image: coffee.image,
+    price: coffee.price,
+    category: coffee.category,
+    rating: coffee.rating,
+    date: new Date().toISOString(),
+    userEmail: user.email,
+    userName: user.displayName || "Unknown User",
+    userPhoto: user.photoURL || "/default-avatar.png",
   };
+
+  try {
+    const res = await axios.post("http://localhost:5000/cart", cartItem);
+    if (res.data.insertedId || res.data.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Added to Cart!",
+        text: `${coffee.title} has been added to your cart.`,
+        background: "#1a1a1a",
+        color: "#d2a679",
+        confirmButtonColor: "#d2a679",
+      }).then(() => {
+        
+        window.location.reload();
+      });
+    }
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Failed to add item to cart!",
+      confirmButtonColor: "#d2a679",
+    });
+  }
+};
+console.log(coffee)
+
 
   if (!coffee)
     return <p className="text-center mt-10 text-white">Loading...</p>;
@@ -90,8 +96,16 @@ const CoffeeDetails = () => {
       <div className="relative bg-backgrondDark h-96 flex flex-col justify-center items-center">
         <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/business-banner.jpg')] bg-bottom bg-no-repeat bg-cover filter grayscale"></div>
         <h2 className="relative text-5xl text-center font-moglan text-white">
-          Our Menu
+          {coffee.title}
         </h2>
+        <div className="breadcrumbs relative  text-zinc-400 text- font-urbanist mt-4">
+          <ul>
+            <li><a href="/" className=" ">Home</a></li>
+
+            <li><a href="/shop" className=" ">Shop</a></li>
+            <li>{coffee.title}</li>
+          </ul>
+        </div>
       </div>
 
       {/* Product Details Section */}
@@ -138,7 +152,7 @@ const CoffeeDetails = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-gradient-to-r from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
+                className="flex-1  bg-[#d2a679] hover:text-white duration-300 hover:bg-darkCoffee text-black py-3 px-6 rounded font-semibold  transition uppercase text-sm "
               >
                 Add to Cart
               </button>
@@ -151,16 +165,28 @@ const CoffeeDetails = () => {
                   state: { product: coffee },
                 })
               }
-              className="flex-1 bg-gradient-to-r w-full from-[#d2a679] to-[#b58855] text-black py-3 px-6 rounded font-semibold hover:bg-gray-200 transition uppercase text-sm hover:scale-105"
+              className="flex-1 w-full  text-black py-3 px-6 rounded font-semibold  transition uppercase text-sm bg-[#d2a679] hover:text-white duration-300 hover:bg-darkCoffee"
             >
               Order Now
             </button>
 
             {/* Category */}
-            <div className="space-y-2 text-sm border-t border-gray-700 pt-6">
+            <div className="space-y-2 text-lg border-t border-gray-700 pt-6">
               <p className="text-gray-400">
                 <span className="font-semibold">Category :</span>{" "}
-                {coffee.category}
+                {coffee.category? coffee.category: 'Hot / Cold'}
+              </p>
+            </div>
+            <div className="space-y-2 text-lg  border-gray-700 ">
+              <p className="text-gray-400">
+                <span className="font-semibold">Flavor :</span>{" "}
+                {coffee.flavor_profile.map(flavor=>flavor)}
+              </p>
+            </div>
+            <div className="space-y-2 text-lg  border-gray-700 ">
+              <p className="text-gray-400">
+                <span className="font-semibold">Ingredients :</span>{" "}
+                {coffee.ingredients.map(flavor=>flavor)}
               </p>
             </div>
           </div>

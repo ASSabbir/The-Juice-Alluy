@@ -120,7 +120,7 @@ const AddToCart = () => {
 
       // Save to database
       const response = await axios.post(
-        "http://localhost:5000/orders",
+        "http://localhost:5000/pending-orders",
         orderData
       );
 
@@ -169,7 +169,10 @@ const AddToCart = () => {
       {/* Cart Section */}
       <div className="mt-[7vw] bg-bac px-[9vw] grid grid-cols-1 lg:grid-cols-3 gap-10 pb-24">
         {/* LEFT - Cart Items */}
-        <div className="lg:col-span-2 bg-backgrondDark rounded-xl p-6">
+        <div className="lg:col-span-2 bg-backgrondDark rounded-xl p-6" style={{
+        backgroundImage:
+          "url('/12.png')",
+      }} >
           <h2 className="text-2xl font-bold text-[#d2a679] mb-6">Cart Items</h2>
           {cart.length === 0 ? (
             <p className="text-gray-400 italic">Your cart is empty</p>
@@ -343,7 +346,7 @@ const AddToCart = () => {
             onClick={handlePayNow}
             className="w-full mt-6 bg-gradient-to-r from-[#d2a679] to-[#b58855] text-black font-bold py-3 rounded-lg hover:scale-105 transition"
           >
-            Pay Now
+            Order Now
           </button>
         </div>
       </div>

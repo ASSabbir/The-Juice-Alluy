@@ -21,7 +21,7 @@ const BestCard = ({ coffee }) => {
           <img
             src={coffee.image}
             alt={coffee.name}
-            className="w-75     object-center object-cover  hover:scale-[1.09] duration-500 transition"
+            className="h-full     object-center object-cover  hover:scale-[1.09] duration-500 transition"
           />
         </figure>
       </NavLink>

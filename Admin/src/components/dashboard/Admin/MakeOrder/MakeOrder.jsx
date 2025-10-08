@@ -157,7 +157,7 @@ const MakeOrder = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/orders", orderData, {
+      const res = await axios.post("http://localhost:5000/progress-orders", orderData, {
         headers: { "Content-Type": "application/json" },
       });
 
