@@ -94,41 +94,31 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center relative bg-cover bg-center"
+      className="min-h-screen w-full flex items-center justify-start md:px-[20vw] relative bg-cover bg-center"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1509042239860-f550ce710b93')",
+          "url('/12.png')",
       }}
     >
       {/* Dark Shadow Overlay */}
-      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="absolute inset-0 bg-black/20"></div>
 
       {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md bg-black/20 backdrop-blur-md rounded-2xl shadow-2xl p-8 mx-4 my-32">
+      <div className="relative z-10 w-full max-w-md  border-[1px]  border-[#333] backdrop-blur-md  shadow-2xl p-8 mx-4 my-32">
         {/* Typewriter Heading */}
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-[#d2a679] drop-shadow-lg">
-          <Typewriter
-            words={["Welcome Back", "Login to Your Coffee Journey"]}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={80}
-            deleteSpeed={50}
-            delaySpeed={2000}
-          />
+        <h2 className="text-4xl font-bol  text-center mb-6 text-white drop-shadow-lg">
+          Sign In 
         </h2>
 
         {/* Motivation Text */}
-        <p className="text-gray-300 text-center mb-8 italic">
-          "Start your day with a cup of happiness — login to continue."
-        </p>
+        
 
         {/* Form */}
         <form onSubmit={handelSubmit} className="space-y-6">
           {/* Email */}
           <div>
             <label className="block text-gray-200 mb-2">Email Address</label>
-            <div className="flex items-center bg-black/50 border border-[#444] rounded-xl px-4">
+            <div className="flex items-center  border-b border-[#444]  px-4">
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
                 type="email"
@@ -142,7 +132,7 @@ const Login = () => {
           {/* Password */}
           <div>
             <label className="block text-gray-200 mb-2">Password</label>
-            <div className="flex items-center bg-black/50 border border-[#444] rounded-xl px-4">
+            <div className="flex items-center border-b  border-[#444]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
                 type={showPassword ? "text" : "password"}
@@ -171,9 +161,9 @@ const Login = () => {
           ) : (
             <button
               type="submit"
-              className="w-full py-3 mt-4 rounded-xl font-bold text-black text-lg
-                       bg-gradient-to-r from-[#d2a679] to-[#b58855]
-                       shadow-md hover:scale-105 hover:shadow-lg hover:shadow-[#d2a679]/50
+              className="w-full py-2 mt-4  font-bold text-black text-lg
+                       bg-lightCoffee hover:text-white cursor-pointer hover:bg-darkCoffee Coffee 
+                        
                        transition duration-300"
             >
               Login
@@ -191,7 +181,7 @@ const Login = () => {
           <button
             onClick={handelgoogle}
             aria-label="Log in with Google"
-            className="relative group p-3 rounded-full shadow-lg hover:scale-110 transition"
+            className="relative group p-3 rounded-full shadow-lg cursor-pointer transition"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

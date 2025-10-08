@@ -1,18 +1,24 @@
 import { createBrowserRouter } from "react-router-dom";
 import Root from "./Root";
 import AddProduct from "./components/dashboard/Admin/AddProduct/AddProduct";
-import Login from "./pages/Login/Login";
+
 import MakeOrder from "./components/dashboard/Admin/MakeOrder/MakeOrder";
+import Private from "./Private/Private";
+import Login from "./components/dashboard/Admin/Login/Login";
+import AllProduct from "./components/dashboard/Admin/AllProduct/AllProduct";
+import EditProduct from "./components/dashboard/Admin/EditProduct/EditProduct";
+import OrdersManagement from "./components/dashboard/Admin/ordermanagement/AdminOrders";
+import AdminDashboard from "./components/dashboard/Admin/ChartBoard/AdminDashboard";
 
 export const Route = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login></Login>,
+  },{
     path: "/",
-    element: <Root></Root>,
+    element: <Private><Root></Root></Private>,
     children: [
-      {
-            path:'/login',
-            element:<Login></Login>
-        },
+
       {
         path: "add_product",  // Remove leading slash
         element: <AddProduct></AddProduct>,
@@ -22,13 +28,25 @@ export const Route = createBrowserRouter([
         element: <MakeOrder></MakeOrder>,  // Replace with actual component
       },
       {
-        path: "admin_allmaterials",
-        element: <></>,  // Replace with actual component
+        path: "all_product",
+        element: <AllProduct></AllProduct>,  // Replace with actual component
       },
       {
         path: "setting",
         element: <></>,  // Replace with actual component
       },
+      {
+        path: "edit-product/:id",
+        element:<EditProduct></EditProduct>
+      },
+      {
+        path:"/order_management",
+        element:<OrdersManagement></OrdersManagement>
+      },
+      {
+        path:"/admin_dashboard",
+        element:<AdminDashboard></AdminDashboard>
+      }
     ],
   },
 ]);

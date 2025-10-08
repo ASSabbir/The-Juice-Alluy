@@ -55,13 +55,16 @@ const Navbar = () => {
               <Link to={"make_order"}>Make Order</Link>
             </li>
             <li className="hover:bg-color1 hover:text-white active:bg-color1">
-              <Link to={"admin_allmaterials"}>View all materials</Link>
+              <Link to={"all_product"}>View all Products</Link>
+            </li>
+            <li className="hover:bg-color1 hover:text-white active:bg-color1">
+              <Link to={"order_management"}>Orders</Link>
             </li>
           </ul>
         </div>
       )}
 
-      <div className="h-screen sticky top-0 bg-color2 text-white hidden md:flex flex-col justify-between py-5 bg-backgrondDark dark:text-white">
+      <div className="fixed top-0 left-0 h-screen bg-color2 text-white hidden md:flex flex-col justify-between py-5 bg-backgrondDark dark:text-white">
         <div className="flex flex-col px-3 items-center">
           <ul className="menu  w-full  text-white  p-0 [&_li>*]:rounded-none">
             <li className="hover:bg-color1 hover:text-white active:bg-color1">
@@ -71,29 +74,14 @@ const Navbar = () => {
               <Link to={"make_order"}>Make Order</Link>
             </li>
             <li className="hover:bg-color1 hover:text-white active:bg-color1">
-              <Link to={"admin_allmaterials"}>View all materials</Link>
+              <Link to={"all_product"}>View all Products</Link>
+            </li>
+            <li className="hover:bg-color1 hover:text-white active:bg-color1">
+              <Link to={"order_management"}>Orders</Link>
             </li>
           </ul>
           <div className="divider"></div>
           <ul className="menu  w-full  text-white  p-0 [&_li>*]:rounded-none">
-            <li className="hover:bg-color1 hover:text-white active:bg-color1">
-              <Link to={"/"}>Home</Link>
-            </li>
-            <li className="hover:bg-color1 hover:text-white active:bg-color1">
-              <Link
-                to={
-                  "https://docs.google.com/document/d/1bv6breYKF_AkR2YCMGSnHaMg6jr82bIF_TI5H9gbNpg/edit?tab=t.0"
-                }
-              >
-                About Us
-              </Link>
-            </li>
-            <li className="hover:bg-color1 hover:text-white active:bg-color1">
-              <Link to={"https://www.facebook.com/"}>Our Facebook</Link>
-            </li>
-            <li className="hover:bg-color1 hover:text-white active:bg-color1">
-              <Link to={"https://x.com/?lang=en"}>Our Twiter</Link>
-            </li>
             <li className="hover:bg-color1 hover:text-white">
               <Link to="setting">Settings</Link>
             </li>
