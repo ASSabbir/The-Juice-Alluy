@@ -13,7 +13,7 @@ const Nav = () => {
   // Fetch cart count from MongoDB
   const fetchCart = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/cart");
+      const res = await axios.get(`http://localhost:5000/cart/`);
       setCartCount(res.data.length);
     } catch (error) {
       console.error("Error fetching cart:", error);
