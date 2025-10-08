@@ -5,6 +5,7 @@ import Marque from './Marque';
 import AboutUs from './AboutUs';
 import BestProducts from './BestProducts';
 import OurJourney from './OurJourney';
+import CustomerReview from './CustomerReview';
 
 const Home = () => {
     return (
@@ -15,6 +16,7 @@ const Home = () => {
             <BestProducts></BestProducts>
             <OurJourney></OurJourney>
             {/* <OurWork></OurWork> */}
+            <CustomerReview></CustomerReview>
         </div>
     );
 };
