@@ -77,16 +77,20 @@ const UserProfile = () => {
   };
 
   // Match order item IDs with coffees collection
-  const getItemNames = (items) => {
-    return items.map((item) => {
-      const matchedCoffee = coffees.find(
-        (c) => c._id.toString() === item.id.toString()
-      );
-      return matchedCoffee
-        ? ` ${matchedCoffee.title} (x${item.quantity})`
-        : ` Unknown Item (x${item.quantity})`;
-    });
-  };
+ const getItemNames = (items) => {
+  if (!Array.isArray(items)) return [];
+
+  return items.map((item) => {
+    const matchedCoffee = coffees.find(
+      (c) => String(c._id) === String(item.id)
+    );
+
+    return matchedCoffee
+      ? `${matchedCoffee.title} (x${item.quantity})`
+      : `Unknown Item (x${item.quantity})`;
+  });
+};
+
 
   return (
     <div className="text-white min-h-screen from-black via-[#3e2723] to-black bg-[url('/bg-2.jpg')]  w-full  bg-center ">
