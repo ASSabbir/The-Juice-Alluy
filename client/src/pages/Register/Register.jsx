@@ -46,6 +46,7 @@ const Register = () => {
     const password = e.target.password.value;
     const confirm = e.target.confirm.value;
     const photoFile = e.target.photo.files[0];
+    
 
     if (username === "" || email === "" || password === "" || confirm === "" || !photoFile) {
       Toast.fire({ icon: "error", title: "All fields must be filled out." });
@@ -94,7 +95,7 @@ const Register = () => {
               });
 
               // Save user to DB
-              const userDoc = { username, email, photoURL: url };
+              const userDoc = { username, email, photoURL: url,createdAt: new Date() };
               axios
                 .post("http://localhost:5000/users", userDoc)
                 .then((res) => console.log(res.data))
@@ -121,7 +122,7 @@ const Register = () => {
           icon: "success",
           title: `Welcome ${user2.user.displayName}`,
         });
-        const userDoc = { email: user2.user.email, };
+        const userDoc = { email: user2.user.email,createdAt: new Date() };
         axios
           .post("http://localhost:5000/users", userDoc)
           .then((res) => console.log(res.data))
@@ -150,12 +151,12 @@ const Register = () => {
         <h2 className="text-3xl font- text-center mb-6 text-white drop-shadow-lg">
           Sign Up
         </h2>
-        
+
 
         <form onSubmit={handleFormSubmit} className="grid-cols-2 grid mt-15 gap-12 ">
           {/* Name */}
           <div>
-            
+
             <div className="flex items-center  border-b border-[#333]  px-4">
               <FaUser className="text-[#d2a679] mr-3" />
               <input
@@ -169,7 +170,7 @@ const Register = () => {
 
           {/* Email */}
           <div>
-            
+
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaEnvelope className="text-[#d2a679] mr-3" />
               <input
@@ -183,7 +184,7 @@ const Register = () => {
 
           {/* Password */}
           <div>
-           
+
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
@@ -204,7 +205,7 @@ const Register = () => {
 
           {/* Confirm Password */}
           <div>
-            
+
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaLock className="text-[#d2a679] mr-3" />
               <input
@@ -225,12 +226,12 @@ const Register = () => {
 
           {/* Upload Photo */}
           <div>
-            
+
             <div className="flex items-center border-b border-[#333]  px-4">
               <FaImage className="text-[#d2a679] mr-3" />
               <input
                 type="file"
-                
+
                 name="photo"
                 className="w-full py-3 text-gray-300 bg-transparent focus:outline-none"
               />
@@ -250,7 +251,7 @@ const Register = () => {
               type="submit"
               className="w-full  h-10   font-bold text-black text-lg
                        bg-gradient-to-r from-[#d2a679] to-[#b58855]
-                       shadow-md 
+                       shadow-md
                        transition duration-300"
             >
               Register
