@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Nav from './components/Nav';
 import Curser from './components/Curser';
 import { ReactLenis, useLenis } from 'lenis/react'
+import Footer from './components/Footer';
 const Root = () => {
     
     return (
@@ -10,7 +11,7 @@ const Root = () => {
             <Nav></Nav>
             {/* <Curser></Curser> */}
             <Outlet></Outlet>
-
+<Footer></Footer>
 
             <ReactLenis
                 root

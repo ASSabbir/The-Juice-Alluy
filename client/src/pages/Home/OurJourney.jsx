@@ -10,7 +10,7 @@ const OurJourney = () => {
     return (
         <div className="relative bg-backgrondDark  flex flex-col justify-center items-center">
             <div className="absolute inset-0 opacity-50 brightness-50 bg-[url('/journey.png')] bg-bottom bg-no-repeat bg-cover bg-center filter grayscale "></div>
-            <div className="flex pt-[10vw] pb-[15vw] px-[15vw] relative w-full justify-between flex-col md:flex-row items-center h-full px-[12vw]">
+            <div className="flex pt-[10vw] pb-[15vw] px-[15vw] relative w-full justify-between flex-col md:flex-row items-center h-full ">
 
                 <div className="  w-full  md:w-1/2">
                     <div className='flex  items-center gap-2 text-xl font-urbanist'>
@@ -26,7 +26,7 @@ const OurJourney = () => {
                 </div>
             </div>
             <div className='w-full px-[15vw] pb-[7vw]'>
-                <div className='flex justify-between w-full border-t-2 pt-15 items-center '>
+                <div className='flex justify-between flex-col md:flex-row w-full border-t-2 pt-15 items-center '>
                     <div className='flex group relative flex-col md:flex-row  gap-3 mt-5'>
                         <div class='group-hover:bg-lightCoffee group-hover:shadow-lg group-hover:shadow-amber-500/30 group-hover:text-zinc-800 
             duration-250 cursor-default bg-zinc-800 p-5 w-fit flex justify-center items-center text-4xl rounded-full 
