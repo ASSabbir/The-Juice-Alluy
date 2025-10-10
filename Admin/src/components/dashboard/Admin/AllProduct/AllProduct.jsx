@@ -8,7 +8,7 @@ const AllProduct = () => {
   useEffect(() => {
     const getCoffees = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/coffee");
+        const res = await axios.get("https://juicealluy.vercel.app/coffee");
         setCoffees(res.data);
       } catch (error) {
         console.error("Error fetching coffee data:", error);

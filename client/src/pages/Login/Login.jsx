@@ -78,7 +78,7 @@ const Login = () => {
         });
         const userDoc = { email: user2.user.email, role: "User" };
         axios
-          .post("http://localhost:5000/users", userDoc)
+          .post("https://juicealluy.vercel.app/users", userDoc)
           .then((res) => console.log(res.data))
           .catch((error) => console.log(error));
 

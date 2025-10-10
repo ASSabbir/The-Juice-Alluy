@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 import { Rating, ThinStar } from "@smastrom/react-rating";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { AuthContext } from "../../providers/AuthContext";
+import { FiCoffee } from "react-icons/fi";
+import BestCard from "../../components/card/BestCard";
 
 
 const CoffeeDetails = () => {
@@ -20,12 +22,18 @@ const CoffeeDetails = () => {
   };
 
   const navigate = useNavigate();
+  const [datas, setDatas] = useState([])
+  useEffect(() => {
+    axios.get('https://juicealluy.vercel.app/best_products')
+      .then(res => setDatas(res.data))
+  }, [])
+
 
   // Fetch specific coffee by ID
   useEffect(() => {
     const getCoffee = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/coffee/${id}`);
+        const res = await axios.get(`https://juicealluy.vercel.app/coffee/${id}`);
         setCoffee(res.data);
       } catch (error) {
         console.error("Error fetching coffee details:", error);
@@ -34,57 +42,57 @@ const CoffeeDetails = () => {
     getCoffee();
   }, [id]);
 
-// Add to Cart Function (with user info)
-const handleAddToCart = async () => {
-  if (!coffee || !user) {
-    Swal.fire({
-      icon: "warning",
-      title: "Please Login!",
-      text: "You need to login before adding to cart.",
-      confirmButtonColor: "#d2a679",
-    });
-    return;
-  }
-
-  const cartItem = {
-    coffeeId: coffee._id,
-    title: coffee.title,
-    image: coffee.image,
-    price: coffee.price,
-    category: coffee.category,
-    rating: coffee.rating,
-    date: new Date().toISOString(),
-    userEmail: user.email,
-    userName: user.displayName || "Unknown User",
-    userPhoto: user.photoURL || "/default-avatar.png",
-  };
-
-  try {
-    const res = await axios.post("http://localhost:5000/cart", cartItem);
-    if (res.data.insertedId || res.data.success) {
+  // Add to Cart Function (with user info)
+  const handleAddToCart = async () => {
+    if (!coffee || !user) {
       Swal.fire({
-        icon: "success",
-        title: "Added to Cart!",
-        text: `${coffee.title} has been added to your cart.`,
-        background: "#1a1a1a",
-        color: "#d2a679",
+        icon: "warning",
+        title: "Please Login!",
+        text: "You need to login before adding to cart.",
         confirmButtonColor: "#d2a679",
-      }).then(() => {
-        
-        window.location.reload();
+      });
+      return;
+    }
+
+    const cartItem = {
+      coffeeId: coffee._id,
+      title: coffee.title,
+      image: coffee.image,
+      price: coffee.price,
+      category: coffee.category,
+      rating: coffee.rating,
+      date: new Date().toISOString(),
+      userEmail: user.email,
+      userName: user.displayName || "Unknown User",
+      userPhoto: user.photoURL || "/default-avatar.png",
+    };
+
+    try {
+      const res = await axios.post("https://juicealluy.vercel.app/cart", cartItem);
+      if (res.data.insertedId || res.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Added to Cart!",
+          text: `${coffee.title} has been added to your cart.`,
+          background: "#1a1a1a",
+          color: "#d2a679",
+          confirmButtonColor: "#d2a679",
+        }).then(() => {
+
+          window.location.reload();
+        });
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to add item to cart!",
+        confirmButtonColor: "#d2a679",
       });
     }
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Failed to add item to cart!",
-      confirmButtonColor: "#d2a679",
-    });
-  }
-};
-console.log(coffee)
+  };
+  console.log(coffee)
 
 
   if (!coffee)
@@ -174,19 +182,19 @@ console.log(coffee)
             <div className="space-y-2 text-lg border-t border-gray-700 pt-6">
               <p className="text-gray-400">
                 <span className="font-semibold">Category :</span>{" "}
-                {coffee.category? coffee.category: 'Hot / Cold'}
+                {coffee.category ? coffee.category : 'Hot / Cold'}
               </p>
             </div>
             <div className="space-y-2 text-lg  border-gray-700 ">
               <p className="text-gray-400">
                 <span className="font-semibold">Flavor :</span>{" "}
-                {coffee.flavor_profile.map(flavor=>flavor)}
+                {coffee.flavor_profile.map(flavor => flavor)}
               </p>
             </div>
             <div className="space-y-2 text-lg  border-gray-700 ">
               <p className="text-gray-400">
                 <span className="font-semibold">Ingredients :</span>{" "}
-                {coffee.ingredients.map(flavor=>flavor)}
+                {coffee.ingredients.map(flavor => flavor)}
               </p>
             </div>
           </div>
@@ -198,31 +206,28 @@ console.log(coffee)
             <div className="flex gap-8">
               <button
                 onClick={() => setActiveTab("description")}
-                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${
-                  activeTab === "description"
+                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${activeTab === "description"
                     ? "text-heading-secondary border-b-2 border-[#d2a679]"
                     : "text-gray-400 hover:text-white"
-                }`}
+                  }`}
               >
                 Description
               </button>
               <button
                 onClick={() => setActiveTab("additional")}
-                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${
-                  activeTab === "additional"
+                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${activeTab === "additional"
                     ? "text-heading-secondary border-b-2 border-[#d2a679]"
                     : "text-gray-400 hover:text-white"
-                }`}
+                  }`}
               >
                 Additional Information
               </button>
               <button
                 onClick={() => setActiveTab("reviews")}
-                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${
-                  activeTab === "reviews"
+                className={`pb-4 px-2 font-semibold transition uppercase text-sm ${activeTab === "reviews"
                     ? "text-heading-secondary border-b-2 border-[#d2a679]"
                     : "text-gray-400 hover:text-white"
-                }`}
+                  }`}
               >
                 Reviews (1)
               </button>
@@ -286,6 +291,13 @@ console.log(coffee)
               </div>
             )}
           </div>
+        </div>
+        <div className='flex w-full border-t-[1px] border-gray-700 mt-20 py-[4vw] justify-center items-center gap-2 text-2xl font-urbanist'>
+          
+          <h1 className="text-4xl font-moglan ">You Might Also Like</h1>
+        </div>
+        <div className="grid  space-y-20  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          {datas.slice(0,3).map((coffee) => <BestCard key={coffee._id} coffee={coffee}></BestCard>)}
         </div>
       </div>
     </div>
