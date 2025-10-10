@@ -68,7 +68,7 @@ const AddProduct = () => {
         const newProduct = { ...product, photo: url };
 
         axios
-          .post("http://localhost:5000/coffee", newProduct)
+          .post("https://juicealluy.vercel.app/coffee", newProduct)
           .then((res) => {
             if (res.data.acknowledged == true) {
               Swal.fire({

@@ -11,12 +11,13 @@ import OrdersManagement from "./components/dashboard/Admin/ordermanagement/Admin
 import AdminDashboard from "./components/dashboard/Admin/ChartBoard/AdminDashboard";
 
 export const Route = createBrowserRouter([
+  // {
+  //   path: "/login",
+  //   element: <Login></Login>,
+  // },
   {
-    path: "/login",
-    element: <Login></Login>,
-  },{
     path: "/",
-    element: <Private><Root></Root></Private>,
+    element: <Root></Root>,
     children: [
 
       {

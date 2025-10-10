@@ -14,7 +14,7 @@ const UserProfile = () => {
   useEffect(() => {
     if (user?.email) {
       axios
-        .get(`http://localhost:5000/user/orders/${user.email}`)
+        .get(`https://juicealluy.vercel.app/user/orders/${user.email}`)
         .then((res) => setOrders(res.data))
         .catch((err) => console.error("Error fetching orders:", err));
     }
@@ -23,7 +23,7 @@ const UserProfile = () => {
   // Fetch all coffees
   useEffect(() => {
     axios
-      .get("http://localhost:5000/coffees")
+      .get("https://juicealluy.vercel.app/coffees")
       .then((res) => setCoffees(res.data))
       .catch((err) => console.error("Error fetching coffees:", err));
   }, []);
@@ -31,7 +31,7 @@ const UserProfile = () => {
   // Handle name update
   const handleUpdateName = async () => {
     try {
-      await axios.put(`http://localhost:5000/users/${user.email}`, {
+      await axios.put(`https://juicealluy.vercel.app/users/${user.email}`, {
         displayName,
       });
       Swal.fire({

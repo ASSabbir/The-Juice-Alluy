@@ -22,7 +22,7 @@ const AddToCart = () => {
   const fetchCart = async () => {
     try {
       if (!user?.email) return;
-      const res = await axios.get(`http://localhost:5000/cart/${user.email}`);
+      const res = await axios.get(`https://juicealluy.vercel.app/cart/${user.email}`);
       setCart(res.data);
     } catch (error) {
       console.error("Error fetching user cart:", error);
@@ -46,7 +46,7 @@ const AddToCart = () => {
   // Delete Item
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/cart/${id}`);
+      await axios.delete(`https://juicealluy.vercel.app/cart/${id}`);
       setCart(cart.filter((item) => item._id !== id));
       Swal.fire("Deleted!", "Item has been removed.", "success");
     } catch (error) {
@@ -120,13 +120,13 @@ const AddToCart = () => {
 
       // Save to database
       const response = await axios.post(
-        "http://localhost:5000/pending-orders",
+        "https://juicealluy.vercel.app/pending-orders",
         orderData
       );
 
       if (response.status === 200 || response.status === 201) {
         // Clear cart from DB
-        await axios.delete(`http://localhost:5000/cart/clear/${user.email}`);
+        await axios.delete(`https://juicealluy.vercel.app/cart/clear/${user.email}`);
         setCart([]);
 
         Swal.fire({

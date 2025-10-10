@@ -12,12 +12,12 @@ const Shop = () => {
     const fetchData = async () => {
       try {
         // Fetch Coffees
-        const coffeeRes = await axios.get("http://localhost:5000/coffee");
+        const coffeeRes = await axios.get("https://juicealluy.vercel.app/coffee");
         setCoffees(coffeeRes.data);
 
         // Fetch Juices
-        const juiceRes = await axios.get("http://localhost:5000/juice");
-        setJuices(juiceRes.data);
+        // const juiceRes = await axios.get("https://juicealluy.vercel.app/juice");
+        // setJuices(juiceRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -64,7 +64,7 @@ const Shop = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b mt-12 flex justify-center space-x-6 font-urbanist text-lg">
+      {/* <div className="border-b mt-12 flex justify-center space-x-6 font-urbanist text-lg">
         <button
           className={`px-6 py-2 font-moglan rounded-full transition duration-300 border-t-2 ${
             activeTab === "all"
@@ -95,14 +95,14 @@ const Shop = () => {
         >
           Juice Items
         </button>
-      </div>
+      </div> */}
 
       {/* Main Section */}
       <div className="mt-[5vw] px-[9vw]">
         {/* Sorting Bar */}
         <div className="flex justify-between py-6 items-center">
           <h1 className="text-xl tracking-wider">
-            Total {displayedItems.length} results
+            Total {displayedItems.length} Items
           </h1>
           <select
             value={sortOption}

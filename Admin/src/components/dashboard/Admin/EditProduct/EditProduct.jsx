@@ -14,7 +14,7 @@ const EditProduct = () => {
   useEffect(() => {
     // Fetch the product data
     axios
-      .get(`http://localhost:5000/coffee/${id}`)
+      .get(`https://juicealluy.vercel.app/coffee/${id}`)
       .then((res) => {
         setProduct(res.data);
         setLoading(false);
@@ -100,7 +100,7 @@ const EditProduct = () => {
         };
 
         axios
-          .put(`http://localhost:5000/coffee/${id}`, updatedProduct)
+          .put(`https://juicealluy.vercel.app/coffee/${id}`, updatedProduct)
           .then((res) => {
             if (res.data.modifiedCount > 0) {
               Swal.fire({
