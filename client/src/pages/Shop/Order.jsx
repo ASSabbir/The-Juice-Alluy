@@ -29,7 +29,7 @@ const Order = () => {
           setProduct(location.state.product);
         } else {
           // Fetch from API
-          const res = await axios.get(`http://localhost:5000/products/${id}`);
+          const res = await axios.get(`https://juicealluy.vercel.app/products/${id}`);
           setProduct(res.data);
         }
       } catch (error) {
@@ -97,7 +97,7 @@ const handleOrderNow = async () => {
       customerPhoto: user?.photoURL || null,
     };
 
-    const response = await axios.post("http://localhost:5000/pending-orders", orderData, {
+    const response = await axios.post("https://juicealluy.vercel.app/pending-orders", orderData, {
       headers: { "Content-Type": "application/json" },
     });
 

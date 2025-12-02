@@ -30,10 +30,10 @@ const AdminOrders = () => {
     try {
       const [pendingRes, progressRes, completedRes, rejectedRes] =
         await Promise.all([
-          axios.get("http://localhost:5000/orders/pending"),
-          axios.get("http://localhost:5000/orders/progress"),
-          axios.get("http://localhost:5000/orders/completed"),
-          axios.get("http://localhost:5000/orders/rejected"),
+          axios.get("https://juicealluy.vercel.app/orders/pending"),
+          axios.get("https://juicealluy.vercel.app/orders/progress"),
+          axios.get("https://juicealluy.vercel.app/orders/completed"),
+          axios.get("https://juicealluy.vercel.app/orders/rejected"),
         ]);
 
       setOrders({
@@ -68,7 +68,7 @@ const AdminOrders = () => {
       console.log("Updating order:", { orderId, newStatus, currentCollection });
 
       const res = await axios.patch(
-        `http://localhost:5000/orders/${orderId}/status`,
+        `https://juicealluy.vercel.app/orders/${orderId}/status`,
         {
           status: newStatus,
           currentCollection: currentCollection,

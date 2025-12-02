@@ -96,7 +96,7 @@ const Register = () => {
               // Save user to DB
               const userDoc = { username, email, photoURL: url };
               axios
-                .post("http://localhost:5000/users", userDoc)
+                .post("https://juicealluy.vercel.app/users", userDoc)
                 .then((res) => console.log(res.data))
                 .catch((error) => console.log(error));
 
@@ -123,7 +123,7 @@ const Register = () => {
         });
         const userDoc = { email: user2.user.email, };
         axios
-          .post("http://localhost:5000/users", userDoc)
+          .post("https://juicealluy.vercel.app/users", userDoc)
           .then((res) => console.log(res.data))
           .catch((error) => console.log(error));
 

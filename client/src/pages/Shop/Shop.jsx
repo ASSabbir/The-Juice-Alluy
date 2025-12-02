@@ -12,12 +12,12 @@ const Shop = () => {
     const fetchData = async () => {
       try {
         // Fetch Coffees
-        const coffeeRes = await axios.get("http://localhost:5000/coffee");
+        const coffeeRes = await axios.get("https://juicealluy.vercel.app/coffee");
         setCoffees(coffeeRes.data);
 
         // Fetch Juices
-        const juiceRes = await axios.get("http://localhost:5000/juice");
-        setJuices(juiceRes.data);
+        // const juiceRes = await axios.get("https://juicealluy.vercel.app/juice");
+        // setJuices(juiceRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

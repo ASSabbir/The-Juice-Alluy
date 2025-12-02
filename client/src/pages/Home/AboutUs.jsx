@@ -3,6 +3,7 @@ import { FiCoffee } from "react-icons/fi";
 import { CiCoffeeCup } from "react-icons/ci";
 import { GoClock } from "react-icons/go";
 import { NavLink } from "react-router-dom";
+import { DiCoffeescript } from "react-icons/di";
 
 const AboutUs = () => {
     return (

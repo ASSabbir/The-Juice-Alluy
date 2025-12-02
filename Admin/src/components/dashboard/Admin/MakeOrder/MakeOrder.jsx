@@ -20,7 +20,7 @@ const MakeOrder = () => {
   useEffect(() => {
     const getCoffees = async () => {
       try {
-        const res = await fetch("http://localhost:5000/coffee");
+        const res = await fetch("https://juicealluy.vercel.app/coffee");
         const data = await res.json();
         setCoffees(data);
         setFilteredCoffees(data);
@@ -157,7 +157,7 @@ const MakeOrder = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/progress-orders", orderData, {
+      const res = await axios.post("https://juicealluy.vercel.app/progress-orders", orderData, {
         headers: { "Content-Type": "application/json" },
       });
 

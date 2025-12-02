@@ -7,7 +7,7 @@ import BestCard from '../../components/card/BestCard';
 const BestProducts = () => {
     const [datas,setDatas]=useState([])
     useEffect(()=>{
-       axios.get('http://localhost:5000/best_products')
+       axios.get('https://juicealluy.vercel.app/best_products')
        .then(res=> setDatas(res.data))
     },[])
     return (

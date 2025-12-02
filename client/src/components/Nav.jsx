@@ -13,7 +13,7 @@ const Nav = () => {
   // Fetch cart count from MongoDB
   const fetchCart = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/cart");
+      const res = await axios.get(`https://juicealluy.vercel.app/cart/`);
       setCartCount(res.data.length);
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -83,6 +83,14 @@ const Nav = () => {
           className="px-4 py-2 hover:bg-[#d2a679]/20 rounded-md transition duration-300"
         >
           Shop
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to="/about"
+          className="px-4 py-2 hover:bg-[#d2a679]/20 rounded-md transition duration-300"
+        >
+          About Us
         </NavLink>
       </li>
       {!user && (
