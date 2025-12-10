@@ -20,7 +20,7 @@ const CustomerReview = () => {
     })
     
     return (
-        <div className={`min-h-screen py-9 md:overflow-hidden relative flex z-0 items-center text-darkCoffee bg-white w-full bg-center`}>
+        <div className={`min-h-screen py-9 overflow-hidden relative flex z-0 items-center text-darkCoffee bg-white w-full bg-center`}>
             <img src="/45.png" alt="" className='absolute opacity-40 -right-40 sm:-right-60 md:-right-70 xl:-right-45 w-64 sm:w-80 md:w-96'/>
             <img src="/coffee-brew-1.png" alt="" className='absolute -left-20 sm:-left-25 md:-left-30 lg:-left-5 opacity-50 -bottom-5 w-32 sm:w-40 md:w-auto'/>
             <img src="/TREE.png" alt="" className='absolute top-0 opacity-50 -left-30 sm:-left-40 md:-left-50 lg:-left-10 w-48 sm:w-60 md:w-78'/>

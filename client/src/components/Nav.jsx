@@ -137,7 +137,7 @@ const Nav = () => {
   );
 
   return (
-    <div className={`navbar fixed z-50 duration-500 top-0 px-[8vw] py-3  ${isVisible ? "translate-y-0" : "-translate-y-full"} ${scrollPosition>50? "bg-backgrondDark/70 backdrop-blur-xl": ""}`}>
+    <div className={`navbar fixed z-50 duration-500 top-0 px-1 md:px-[8vw] py-3  ${isVisible ? "translate-y-0" : "-translate-y-full"} ${scrollPosition>50? "bg-backgrondDark/70 backdrop-blur-xl": ""}`}>
       {/* Left: Title */}
       <div className="navbar-start">
         <div className="dropdown">
@@ -167,7 +167,7 @@ const Nav = () => {
 
         <Link
           to="/"
-          className="btn btn-ghost text-3xl tracking-widest font-moglan text-[#d2a679]"
+          className="btn btn-ghost text-xl md:text-3xl tracking-widest font-moglan text-[#d2a679]"
         >
           The Juice Alluy
         </Link>

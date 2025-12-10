@@ -3,7 +3,7 @@ import Navbar from './components/dashboard/Admin/NavBar/Navbar';
 
 const Root = () => {
     return (
-        <div className='font-urbanist text-lightCoffee bg-backgrondLight min-h-screen'>
+        <div className='font-urbanist  text-lightCoffee bg-backgrondLight min-h-screen'>
             <div className='flex'>
                 {/* Sidebar */}
                 <div className='w-64 flex-shrink-0'>
